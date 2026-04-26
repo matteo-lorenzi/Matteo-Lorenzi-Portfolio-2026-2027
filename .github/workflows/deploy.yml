@@ -6,6 +6,9 @@ on:
       - main
   workflow_dispatch:
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true  # Fix Node.js 20 deprecation warnings
+
 permissions:
   contents: read
   pages: write
@@ -41,12 +44,15 @@ jobs:
             echo "SITE_URL=https://${owner}.github.io" >> "$GITHUB_ENV"
             echo "BASE_PATH=/" >> "$GITHUB_ENV"
           else
-            echo "SITE_URL=https://${owner}.github.io" >> "$GITHUB_ENV"
-            echo "BASE_PATH=/${repo}" >> "$GITHUB_ENV"
+            echo "SITE_URL=https://${owner}.github.io/${repo}" >> "$GITHUB_ENV"  # ← was missing /${repo}
+            echo "BASE_PATH=/${repo}/" >> "$GITHUB_ENV"  # ← trailing slash required by Astro
           fi
 
       - name: Build
         run: npm run build
+        env:
+          SITE: ${{ env.SITE_URL }}      # ← pass vars into the build
+          BASE: ${{ env.BASE_PATH }}     # ← pass vars into the build
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
