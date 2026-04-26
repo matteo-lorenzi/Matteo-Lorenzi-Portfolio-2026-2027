@@ -4,8 +4,8 @@ import tailwind from "@astrojs/tailwind";
 import react from "@astrojs/react";
 
 export default defineConfig({
-  site: process.env.SITE ?? 'http://localhost:4321',
-  base: process.env.BASE ?? '/',
+  site: 'https://matteo-lorenzi.github.io',
+  base: "/matteo-lorenzi-portfolio-2026-2027",
   output: "static",
   vite: {
     optimizeDeps: {
