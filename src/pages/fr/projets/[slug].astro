@@ -1,0 +1,38 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import ProjectTemplate from "../../../components/ProjectTemplate.astro";
+
+export async function getStaticPaths() {
+  const projects = await getCollection("projects");
+  return projects.map((project) => ({
+    params: { slug: project.slug },
+    props: { project },
+  }));
+}
+
+const { project } = Astro.props;
+const orderedProjects = (await getCollection("projects")).sort(
+  (a, b) => a.data.order - b.data.order,
+);
+const currentIndex = orderedProjects.findIndex(
+  (entry) => entry.slug === project.slug,
+);
+const indexLabel = `[ ${String(currentIndex + 1).padStart(2, "0")} / ${String(orderedProjects.length).padStart(2, "0")} ]`;
+const previous =
+  currentIndex > 0 ? orderedProjects[currentIndex - 1] : undefined;
+const next =
+  currentIndex < orderedProjects.length - 1
+    ? orderedProjects[currentIndex + 1]
+    : undefined;
+---
+
+<BaseLayout locale="fr" title={`${project.data.title} - M.L`}>
+  <ProjectTemplate
+    project={project}
+    locale="fr"
+    indexLabel={indexLabel}
+    previous={previous}
+    next={next}
+  />
+</BaseLayout>

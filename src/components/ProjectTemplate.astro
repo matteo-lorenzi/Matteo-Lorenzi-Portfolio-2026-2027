@@ -1,0 +1,117 @@
+---
+import type { CollectionEntry } from "astro:content";
+import type { Locale } from "../i18n";
+import { getTranslations } from "../i18n";
+import ImageSlices from "./ImageSlices.astro";
+
+interface Props {
+  project: CollectionEntry<"projects">;
+  locale: Locale;
+  indexLabel: string;
+  previous?: CollectionEntry<"projects">;
+  next?: CollectionEntry<"projects">;
+}
+
+const { project, locale, indexLabel, previous, next } = Astro.props;
+const t = getTranslations(locale);
+const description =
+  locale === "fr" ? project.data.description_fr : project.data.description_en;
+const quote = locale === "fr" ? project.data.quote_fr : project.data.quote_en;
+const role = locale === "fr" ? project.data.role_fr : project.data.role_en;
+const basePath = locale === "fr" ? "/fr/projets/" : "/en/projects/";
+const listPath = locale === "fr" ? "/fr/projets/" : "/en/projects/";
+---
+
+<article class="grid-main pb-24 pt-28 md:pt-32">
+  <div class="col-content space-y-4 reveal-item">
+    <p class="text-label">{indexLabel}</p>
+    <p class="text-label">{project.data.category} · {project.data.year}</p>
+    <h1 class="text-heading">{project.data.title}</h1>
+  </div>
+
+  {
+    quote && (
+      <figure class="col-content mt-12 project-quote reveal-item">
+        <blockquote>
+          <p class="text-subheading">{quote}</p>
+        </blockquote>
+        <figcaption class="mt-4 text-label">
+          {t.projectDetail.quoteLabel}
+        </figcaption>
+      </figure>
+    )
+  }
+
+  <div class="col-full mt-12 reveal-item">
+    <ImageSlices
+      src={project.data.cover}
+      alt={project.data.title}
+      slices={10}
+    />
+  </div>
+
+  <div class="col-left mt-12 reveal-item">
+    <p class="text-body">{description}</p>
+  </div>
+
+  <div class="col-right mt-12 reveal-item">
+    <p class="text-label">{t.projectDetail.role}</p>
+    <p class="text-body">{role ?? "-"}</p>
+    <p class="mt-8 text-label">{t.projectDetail.tools}</p>
+    <p class="text-body">{project.data.tools?.join(" · ") ?? "-"}</p>
+    <p class="mt-8 text-label">{t.projectDetail.year}</p>
+    <p class="text-body">{project.data.year}</p>
+  </div>
+
+  {
+    project.data.images?.map((image, idx) => (
+      <div
+        class={
+          idx % 2 === 0
+            ? "col-left mt-12 reveal-item"
+            : "col-right mt-12 reveal-item"
+        }
+      >
+        <img
+          src={image}
+          alt={`${project.data.title} image ${idx + 1}`}
+          class="aspect-[4/3] w-full object-cover grayscale"
+          loading="lazy"
+        />
+      </div>
+    ))
+  }
+
+  <nav
+    class="col-content mt-16 grid grid-cols-1 gap-3 border-t border-[var(--color-border)] pt-6 text-label reveal-item md:grid-cols-3 md:items-center"
+    aria-label={t.projectDetail.navLabel}
+  >
+    {
+      previous ? (
+        <a
+          href={`${basePath}${previous.slug}/`}
+          class="project-detail-nav-link md:justify-self-start"
+        >
+          {t.projectDetail.prev}
+        </a>
+      ) : (
+        <span class="hidden md:block" />
+      )
+    }
+    <a href={listPath} class="project-detail-nav-link md:justify-self-center"
+      >{t.projectDetail.backToList}</a
+    >
+    {
+      next ? (
+        <a
+          href={`${basePath}${next.slug}/`}
+          class="project-detail-nav-link md:justify-self-end"
+        >
+          {t.projectDetail.next}
+        </a>
+      ) : (
+        <span class="hidden md:block" />
+      )
+    }
+  </nav>
+</article>

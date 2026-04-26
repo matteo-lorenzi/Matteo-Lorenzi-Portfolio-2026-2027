@@ -1,0 +1,149 @@
+<div id="curtain-transition" class="curtain-transition" aria-hidden="true">
+  <div
+    class="loader-wrap"
+    role="status"
+    aria-live="polite"
+    aria-label="Loading"
+  >
+    <div class="container"></div>
+  </div>
+</div>
+
+<style>
+  .curtain-transition {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: grid;
+    place-items: center;
+    background: var(--color-paper);
+    transform: scaleY(1);
+    transform-origin: top;
+    pointer-events: auto;
+  }
+
+  .loader-wrap {
+    display: grid;
+    place-items: center;
+  }
+
+  .container {
+    --uib-size: 45px;
+    --uib-color: var(--color-ink);
+    --uib-speed: 2s;
+    position: relative;
+    height: var(--uib-size);
+    width: var(--uib-size);
+  }
+
+  .container::before,
+  .container::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    border-radius: 50%;
+    background-color: var(--uib-color);
+    animation: pulse var(--uib-speed) linear infinite;
+    transform: scale(0);
+    opacity: 0;
+    transition: background-color 0.3s ease;
+  }
+
+  .container::after {
+    animation-delay: calc(var(--uib-speed) / -2);
+  }
+
+  @keyframes pulse {
+    0% {
+      transform: scale(0);
+      opacity: 1;
+    }
+
+    100% {
+      transform: scale(1);
+      opacity: 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .container::before,
+    .container::after {
+      animation: none;
+      transform: scale(1);
+      opacity: 0.85;
+    }
+  }
+</style>
+
+<script>
+  import gsap from "gsap";
+
+  const curtain = document.getElementById("curtain-transition");
+  const MIN_LOADER_DURATION = 1000; // Durée minimale du loader en ms
+  const MAX_BLOCK_DURATION = 3000; // Securite anti-blocage
+
+  let loaderStartTime = Date.now();
+  let revealTimer = 0;
+  let forceRevealTimer = 0;
+  let hasRevealed = false;
+
+  const revealPage = () => {
+    if (!curtain || hasRevealed) return;
+
+    const elapsed = Date.now() - loaderStartTime;
+    const remainingTime = Math.max(0, MIN_LOADER_DURATION - elapsed);
+
+    if (revealTimer !== 0) {
+      window.clearTimeout(revealTimer);
+    }
+
+    // Attendre le temps restant avant de masquer
+    revealTimer = window.setTimeout(() => {
+      if (hasRevealed) return;
+      hasRevealed = true;
+      gsap.set(curtain, { transformOrigin: "top" });
+      gsap.to(curtain, {
+        scaleY: 0,
+        duration: 0.4,
+        ease: "power2.out",
+        onComplete: () => {
+          gsap.set(curtain, { pointerEvents: "none" });
+        },
+      });
+    }, remainingTime);
+  };
+
+  document.addEventListener("astro:before-preparation", () => {
+    if (!curtain) return;
+    loaderStartTime = Date.now();
+    hasRevealed = false;
+    if (revealTimer !== 0) {
+      window.clearTimeout(revealTimer);
+    }
+    if (forceRevealTimer !== 0) {
+      window.clearTimeout(forceRevealTimer);
+    }
+    gsap.set(curtain, { transformOrigin: "bottom", pointerEvents: "auto" });
+    gsap.to(curtain, { scaleY: 1, duration: 0.4, ease: "power2.in" });
+
+    // Si un event Astro manque, on evite de rester bloque sur le loader
+    forceRevealTimer = window.setTimeout(() => {
+      revealPage();
+    }, MAX_BLOCK_DURATION);
+  });
+
+  document.addEventListener("astro:page-load", () => {
+    revealPage();
+  });
+
+  if (document.readyState === "complete") {
+    revealPage();
+  } else {
+    window.addEventListener("load", () => {
+      revealPage();
+    });
+  }
+</script>

@@ -1,0 +1,99 @@
+---
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import { getCollection } from "astro:content";
+import { t } from "../../../i18n/en";
+
+const experiences = (await getCollection("experiences")).sort(
+  (a, b) => a.data.order - b.data.order,
+);
+---
+
+<BaseLayout locale="en" title="Professional Experience - M.L">
+  <section class="grid-main pb-16 pt-20 md:pt-24 lg:pt-32">
+    <div class="col-content space-y-16">
+      <header
+        class="reveal-item space-y-6 border-b border-[var(--color-border)] pb-12"
+      >
+        <p class="text-label text-[var(--color-ink)]">
+          {t.experiencePage.kicker}
+        </p>
+        <h1 class="text-heading">{t.experiencePage.title}</h1>
+        <p class="text-body max-w-[72ch] text-[var(--color-ink)]">
+          {t.experiencePage.intro}
+        </p>
+      </header>
+
+      <p class="text-label">{t.experiencePage.count(experiences.length)}</p>
+
+      <ul class="experience-gallery" role="list">
+        {
+          experiences.map((item, index) => (
+            <li
+              class:list={[
+                "reveal-item experience-card border border-[var(--color-border)] p-6 md:p-8",
+                index % 3 === 0 ? "md:col-span-2" : "md:col-span-1",
+              ]}
+            >
+              <article aria-labelledby={`experience-title-${item.slug}`}>
+                <div class="flex flex-wrap items-center gap-3">
+                  <p class="text-label text-[var(--color-ink)]">
+                    {item.data.period}
+                  </p>
+                  <span class="tag-radius border border-[var(--color-border)] px-2 py-1 text-label">
+                    {item.data.type_en}
+                  </span>
+                </div>
+                <h2
+                  id={`experience-title-${item.slug}`}
+                  class="mt-4 text-subheading text-[var(--color-ink)]"
+                >
+                  {item.data.role_en}
+                </h2>
+                <p class="mt-2 text-body text-[var(--color-ink)]">
+                  {item.data.company} · {item.data.location_en}
+                </p>
+                <p class="mt-4 text-body">{item.data.summary_en}</p>
+                <ul class="mt-6 list-disc space-y-2 pl-5 text-body">
+                  {item.data.highlights_en.map((highlight) => (
+                    <li>{highlight}</li>
+                  ))}
+                </ul>
+              </article>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <style is:global>
+    .experience-gallery {
+      display: grid;
+      gap: 1rem;
+      grid-template-columns: 1fr;
+    }
+
+    .experience-card {
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(
+        145deg,
+        color-mix(in srgb, var(--color-paper) 88%, var(--color-ink) 12%) 0%,
+        var(--color-paper) 42%,
+        color-mix(in srgb, var(--color-paper) 94%, var(--color-ink) 6%) 100%
+      );
+      transition: border-color var(--transition-base);
+    }
+
+    .experience-card:hover,
+    .experience-card:focus-within {
+      border-color: var(--color-ink);
+    }
+
+    @media (min-width: 768px) {
+      .experience-gallery {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
+  </style>
+</BaseLayout>

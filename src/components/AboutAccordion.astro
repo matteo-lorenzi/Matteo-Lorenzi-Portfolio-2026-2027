@@ -1,0 +1,156 @@
+---
+interface AccordionItem {
+  id: string;
+  title: string;
+  text?: string;
+  bullets?: readonly string[];
+}
+
+interface Props {
+  items: AccordionItem[];
+  defaultOpenId?: string;
+}
+
+const { items, defaultOpenId = items[0]?.id } = Astro.props;
+const rootId = `about-accordion-${Math.random().toString(36).slice(2, 9)}`;
+---
+
+<section
+  class="reveal-item border border-[var(--color-border)]"
+  data-accordion-root
+  data-default-open={defaultOpenId}
+  id={rootId}
+>
+  {
+    items.map((item, index) => {
+      const buttonId = `${rootId}-trigger-${item.id}`;
+      const panelId = `${rootId}-panel-${item.id}`;
+      const isOpen = item.id === defaultOpenId;
+
+      return (
+        <div class={index === 0 ? "" : "border-t border-[var(--color-border)]"}>
+          <h2>
+            <button
+              id={buttonId}
+              type="button"
+              class="flex w-full items-center justify-between px-6 py-5 text-left md:px-8"
+              data-accordion-trigger
+              data-item-id={item.id}
+              aria-expanded={isOpen ? "true" : "false"}
+              aria-controls={panelId}
+            >
+              <span class="text-subheading text-[var(--color-ink)]">
+                {item.title}
+              </span>
+              <span
+                class="text-label text-[var(--color-ink)]"
+                data-accordion-indicator
+              >
+                {isOpen ? "-" : "+"}
+              </span>
+            </button>
+          </h2>
+
+          <div
+            id={panelId}
+            role="region"
+            aria-labelledby={buttonId}
+            class:list={[
+              "grid transition-[grid-template-rows,opacity] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]",
+              isOpen
+                ? "grid-rows-[1fr] opacity-100"
+                : "grid-rows-[0fr] opacity-0",
+            ]}
+            data-accordion-panel
+            data-item-id={item.id}
+            aria-hidden={isOpen ? "false" : "true"}
+          >
+            <div class="min-h-0 overflow-hidden px-6 pb-6 md:px-8">
+              {item.text && <p class="text-body">{item.text}</p>}
+              {item.bullets && (
+                <ul class="list-disc space-y-2 pl-5 text-body">
+                  {item.bullets.map((value) => (
+                    <li>{value}</li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          </div>
+        </div>
+      );
+    })
+  }
+</section>
+
+<script>
+  const roots = document.querySelectorAll("[data-accordion-root]");
+
+  roots.forEach((root) => {
+    if (!(root instanceof HTMLElement) || root.dataset.initialized === "true") {
+      return;
+    }
+
+    root.dataset.initialized = "true";
+
+    const triggers = Array.from(
+      root.querySelectorAll("[data-accordion-trigger]"),
+    ).filter((el): el is HTMLButtonElement => el instanceof HTMLButtonElement);
+
+    const panels = Array.from(
+      root.querySelectorAll("[data-accordion-panel]"),
+    ).filter((el): el is HTMLElement => el instanceof HTMLElement);
+
+    const setOpen = (id: string) => {
+      triggers.forEach((trigger) => {
+        const isOpen = trigger.dataset.itemId === id;
+        trigger.setAttribute("aria-expanded", String(isOpen));
+        const indicator = trigger.querySelector("[data-accordion-indicator]");
+        if (indicator) {
+          indicator.textContent = isOpen ? "-" : "+";
+        }
+      });
+
+      panels.forEach((panel) => {
+        const isOpen = panel.dataset.itemId === id;
+        panel.setAttribute("aria-hidden", isOpen ? "false" : "true");
+        panel.classList.toggle("grid-rows-[1fr]", isOpen);
+        panel.classList.toggle("opacity-100", isOpen);
+        panel.classList.toggle("grid-rows-[0fr]", !isOpen);
+        panel.classList.toggle("opacity-0", !isOpen);
+      });
+    };
+
+    const defaultOpen = root.dataset.defaultOpen;
+    if (defaultOpen) {
+      setOpen(defaultOpen);
+    }
+
+    triggers.forEach((trigger, index) => {
+      trigger.addEventListener("click", () => {
+        setOpen(trigger.dataset.itemId ?? "");
+      });
+
+      trigger.addEventListener("keydown", (event) => {
+        if (event.key === "ArrowDown") {
+          event.preventDefault();
+          triggers[(index + 1) % triggers.length]?.focus();
+        }
+
+        if (event.key === "ArrowUp") {
+          event.preventDefault();
+          triggers[(index - 1 + triggers.length) % triggers.length]?.focus();
+        }
+
+        if (event.key === "Home") {
+          event.preventDefault();
+          triggers[0]?.focus();
+        }
+
+        if (event.key === "End") {
+          event.preventDefault();
+          triggers[triggers.length - 1]?.focus();
+        }
+      });
+    });
+  });
+</script>

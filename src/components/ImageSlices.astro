@@ -1,0 +1,89 @@
+---
+interface Props {
+  src: string;
+  alt: string;
+  slices?: number;
+}
+
+const { src, alt, slices = 10 } = Astro.props;
+const items = Array.from({ length: slices }, (_, index) => index);
+const sliceRules = items
+  .map(
+    (slice) =>
+      `.slice-${slice} { background-position: ${(slice / Math.max(slices - 1, 1)) * 100}% 50%; }`,
+  )
+  .join("\n");
+---
+
+<figure
+  class="relative grid h-[360px] w-full overflow-hidden border border-[var(--color-border)] md:h-[460px]"
+  data-slices-wrapper
+  data-slices-src={src}
+  role="img"
+  aria-label={alt}
+>
+  {
+    items.map((slice) => (
+      <div
+        class={`slice slice-${slice} relative h-full bg-cover bg-no-repeat`}
+        data-slice={slice}
+        aria-hidden="true"
+      />
+    ))
+  }
+</figure>
+
+<style
+  is:global
+  set:html={`
+[data-slices-wrapper] .slice {
+  will-change: transform;
+}
+${sliceRules}
+`}
+></style>
+
+<script>
+  import gsap from "gsap";
+  import ScrollTrigger from "gsap/ScrollTrigger";
+
+  if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    gsap.registerPlugin(ScrollTrigger);
+
+    document
+      .querySelectorAll("[data-slices-wrapper]")
+      .forEach((wrapperElement) => {
+        if (!(wrapperElement instanceof HTMLElement)) {
+          return;
+        }
+
+        const wrapper = wrapperElement;
+        const sliceElements = wrapper.querySelectorAll(".slice");
+        const source = wrapper.getAttribute("data-slices-src") ?? "";
+        const count = sliceElements.length;
+
+        wrapper.style.gridTemplateColumns = `repeat(${count}, 1fr)`;
+
+        sliceElements.forEach((sliceElement, index) => {
+          if (!(sliceElement instanceof HTMLElement)) {
+            return;
+          }
+
+          const slice = sliceElement;
+          slice.style.backgroundImage = `url(${source})`;
+          slice.style.backgroundSize = `${count * 100}% 100%`;
+          const amplitude = index % 2 === 0 ? 40 : -40;
+          gsap.to(slice, {
+            y: amplitude,
+            ease: "none",
+            scrollTrigger: {
+              trigger: wrapper,
+              start: "top bottom",
+              end: "bottom top",
+              scrub: true,
+            },
+          });
+        });
+      });
+  }
+</script>

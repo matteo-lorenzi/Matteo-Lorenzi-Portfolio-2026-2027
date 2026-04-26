@@ -1,0 +1,187 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import AboutAccordion from "../../components/AboutAccordion.astro";
+import { t } from "../../i18n/en";
+
+const aboutAccordionItems = [
+  {
+    id: "approach",
+    title: t.aboutPage.approachTitle,
+    text: t.aboutPage.approach,
+  },
+  {
+    id: "values",
+    title: t.aboutPage.valuesTitle,
+    bullets: [...t.aboutPage.values],
+  },
+];
+---
+
+<BaseLayout locale="en" title="About - M.L">
+  <section class="grid-main pb-16 pt-20 md:pt-24 lg:pt-32">
+    <div class="col-content space-y-16">
+      <header
+        class="reveal-item space-y-6 border-b border-[var(--color-border)] pb-12"
+      >
+        <p class="text-label text-[var(--color-ink)]">{t.aboutPage.kicker}</p>
+        <h1 class="text-heading">{t.aboutPage.title}</h1>
+        <p class="text-body max-w-[72ch] text-[var(--color-ink)]">
+          {t.aboutPage.personalInfo.description}
+        </p>
+      </header>
+
+      <div class="grid gap-8 md:grid-cols-2">
+        <section
+          aria-labelledby="about-profile-title"
+          class="reveal-item border border-[var(--color-border)] p-6 md:p-8"
+        >
+          <h2
+            id="about-profile-title"
+            class="text-subheading text-[var(--color-ink)]"
+          >
+            {t.aboutPage.personalInfo.name}
+          </h2>
+          <p class="mt-2 text-label">{t.aboutPage.personalInfo.title}</p>
+          <p class="mt-5 max-w-[72ch] text-body">{t.aboutPage.profile}</p>
+          <a
+            href={t.aboutPage.personalInfo.githubUrl}
+            target="_blank"
+            rel="noreferrer"
+            class="mt-6 inline-block border border-[var(--color-ink)] px-4 py-2 text-label text-[var(--color-ink)] transition-colors hover:bg-[var(--color-ink)] hover:text-[var(--color-paper)]"
+          >
+            {t.aboutPage.personalInfo.githubLabel}
+          </a>
+        </section>
+
+        <section
+          aria-labelledby="about-stats-title"
+          class="reveal-item border border-[var(--color-border)] p-6 md:p-8"
+        >
+          <h2
+            id="about-stats-title"
+            class="text-subheading text-[var(--color-ink)]"
+          >
+            {t.aboutPage.statsTitle}
+          </h2>
+          <div class="mt-5 grid gap-4 sm:grid-cols-2">
+            {
+              t.aboutPage.profileStats.map((stat) => (
+                <div class="border border-[var(--color-border)] p-4">
+                  <p class="text-heading">{stat.number}</p>
+                  <p class="text-label">{stat.label}</p>
+                </div>
+              ))
+            }
+          </div>
+        </section>
+      </div>
+
+      <section
+        aria-labelledby="about-skills-title"
+        class="reveal-item space-y-4 border border-[var(--color-border)] p-6 md:p-8"
+      >
+        <h2
+          id="about-skills-title"
+          class="text-subheading text-[var(--color-ink)]"
+        >
+          {t.aboutPage.skillsTitle}
+        </h2>
+        <div class="grid gap-4 md:grid-cols-3">
+          {
+            t.aboutPage.skillCategories.map((category) => (
+              <div class="space-y-3 border border-[var(--color-border)] p-4">
+                <p class="text-label text-[var(--color-ink)]">
+                  {category.title}
+                </p>
+                <ul class="space-y-2 text-body">
+                  {category.skills.map((skill) => (
+                    <li>{skill}</li>
+                  ))}
+                </ul>
+              </div>
+            ))
+          }
+        </div>
+      </section>
+
+      <AboutAccordion items={aboutAccordionItems} defaultOpenId="approach" />
+
+      <section
+        aria-labelledby="about-timeline-title"
+        class="reveal-item space-y-4 border border-[var(--color-border)] p-6 md:p-8"
+      >
+        <h2
+          id="about-timeline-title"
+          class="text-subheading text-[var(--color-ink)]"
+        >
+          {t.aboutPage.timelineTitle}
+        </h2>
+        <ol class="space-y-4 text-body">
+          {
+            t.aboutPage.timeline.map((step) => (
+              <li class="border border-[var(--color-border)] p-4">
+                <p class="text-label text-[var(--color-ink)]">{step.period}</p>
+                <p class="mt-2 text-subheading text-[var(--color-ink)]">
+                  {step.title}
+                </p>
+                <a
+                  href={step.institutionUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  class="mt-2 inline-block text-label text-[var(--color-ink)] underline"
+                >
+                  {step.institution}
+                </a>
+                <p class="mt-3 text-body">{step.detail}</p>
+              </li>
+            ))
+          }
+        </ol>
+      </section>
+
+      <section
+        aria-labelledby="about-interests-title"
+        class="reveal-item space-y-4 border border-[var(--color-border)] p-6"
+      >
+        <h2
+          id="about-interests-title"
+          class="text-subheading text-[var(--color-ink)]"
+        >
+          {t.aboutPage.interestsTitle}
+        </h2>
+        <ul class="flex flex-wrap gap-2">
+          {
+            t.aboutPage.interests.map((interest) => (
+              <li class="tag-radius border border-[var(--color-border)] px-3 py-2 text-label text-[var(--color-ink)]">
+                <span aria-hidden="true">{interest.icon}</span>
+                <span class="ml-2">{interest.name}</span>
+              </li>
+            ))
+          }
+        </ul>
+      </section>
+
+      <section
+        aria-labelledby="about-tools-title"
+        class="reveal-item space-y-4 border border-[var(--color-border)] p-6"
+      >
+        <h2
+          id="about-tools-title"
+          class="text-subheading text-[var(--color-ink)]"
+        >
+          {t.aboutPage.toolsTitle}
+        </h2>
+        <p class="text-body">{t.aboutPage.tools}</p>
+      </section>
+
+      <div class="reveal-item border-t border-[var(--color-border)] pt-8">
+        <a
+          href="/en/contact/"
+          class="inline-block border border-[var(--color-ink)] px-4 py-2 text-label text-[var(--color-ink)] transition-colors hover:bg-[var(--color-ink)] hover:text-[var(--color-paper)]"
+        >
+          {t.aboutPage.ctaLabel}
+        </a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

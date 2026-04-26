@@ -1,0 +1,64 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { t } from "../../i18n/fr";
+import { formspreeEndpoint, isFormspreeConfigured } from "../../config/runtime";
+---
+
+<BaseLayout locale="fr" title="Contact - M.L">
+  <section class="grid-main pb-16 pt-20 md:pt-24 lg:pt-32">
+    <div class="col-content space-y-8">
+      <header
+        class="reveal-item border-b border-[var(--color-border)] pb-12 space-y-3"
+      >
+        <h1 class="text-heading">{t.contact.title}</h1>
+      </header>
+
+      <div class="reveal-item space-y-8">
+        <a href={`mailto:${t.contact.email}`} class="block text-3xl"
+          >{t.contact.email}</a
+        >
+        <form
+          action={isFormspreeConfigured ? formspreeEndpoint : "#"}
+          method="POST"
+          class="grid gap-4 md:grid-cols-2"
+        >
+          <input
+            name="name"
+            type="text"
+            placeholder={t.contact.nameLabel}
+            class="border border-[var(--color-border)] bg-transparent p-3"
+            required
+          />
+          <input
+            name="email"
+            type="email"
+            placeholder={t.contact.emailLabel}
+            class="border border-[var(--color-border)] bg-transparent p-3"
+            required
+          />
+          <textarea
+            name="message"
+            rows="6"
+            placeholder={t.contact.messageLabel}
+            class="md:col-span-2 border border-[var(--color-border)] bg-transparent p-3"
+            required></textarea>
+          <button
+            type="submit"
+            class="w-fit border border-[var(--color-ink)] px-4 py-2 text-label"
+            >{t.contact.send}</button
+          >
+        </form>
+        {
+          !isFormspreeConfigured && (
+            <p class="text-label">{t.contact.setupHint}</p>
+          )
+        }
+        <a
+          href="/cv.pdf"
+          class="inline-block w-fit border border-[var(--color-ink)] px-4 py-2 text-label"
+          >{t.contact.cv}</a
+        >
+      </div>
+    </div>
+  </section>
+</BaseLayout>

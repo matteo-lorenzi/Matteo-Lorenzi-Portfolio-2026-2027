@@ -1,0 +1,55 @@
+---
+import type { Locale } from "../i18n";
+import { getTranslations } from "../i18n";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = getTranslations(locale);
+const legalPath =
+  locale === "fr" ? "/fr/mentions-legales/" : "/en/mentions-legales/";
+---
+
+<footer class="grid-main mt-24 border-t border-[var(--color-border)] !py-16">
+  <div class="col-content grid gap-6 text-label md:grid-cols-3 md:items-center">
+    <span>{t.footer.copyright}</span>
+    <button
+      id="footer-back-to-top"
+      type="button"
+      class="justify-self-start border border-[var(--color-ink)] px-4 py-2 text-label text-[var(--color-ink)] transition-colors hover:bg-[var(--color-ink)] hover:text-[var(--color-paper)] md:justify-self-center"
+      aria-label={`${t.footer.backToTop} ↑`}
+    >
+      {t.footer.backToTop} ↑
+    </button>
+    <div class="flex flex-wrap gap-4 md:justify-center">
+      <a
+        href="https://www.linkedin.com/in/matteo-lorenzi-iut2/?locale=fr"
+        target="_blank"
+        rel="noreferrer">LinkedIn</a
+      >
+      <a
+        href="https://github.com/matteo-lorenzi"
+        target="_blank"
+        rel="noreferrer">GitHub</a
+      >
+      <a href={legalPath}>{t.footer.legal}</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  const backToTop = document.getElementById("footer-back-to-top");
+
+  backToTop?.addEventListener("click", () => {
+    const reduceMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+
+    window.scrollTo({
+      top: 0,
+      behavior: reduceMotion ? "auto" : "smooth",
+    });
+  });
+</script>

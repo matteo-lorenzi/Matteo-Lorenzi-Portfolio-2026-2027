@@ -1,0 +1,43 @@
+---
+import type { Locale } from "../i18n";
+import { getTranslations } from "../i18n";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = getTranslations(locale);
+---
+
+<button
+  id="switch-atmosphere"
+  type="button"
+  aria-label={t.transition.label}
+  class="fixed bottom-4 right-4 z-[200] border border-[var(--color-ink)] px-3 py-2 text-[10px] uppercase tracking-[0.12em]"
+>
+  {t.transition.label}
+</button>
+
+<script>
+  const root = document.documentElement;
+  const storageKey = "portfolio-theme";
+
+  const setTheme = (theme: "dark" | "light") => {
+    root.setAttribute("data-theme", theme);
+    localStorage.setItem(storageKey, theme);
+  };
+
+  const savedTheme = localStorage.getItem(storageKey);
+  const initialTheme: "dark" | "light" =
+    savedTheme === "light" ? "light" : "dark";
+  setTheme(initialTheme);
+
+  document
+    .getElementById("switch-atmosphere")
+    ?.addEventListener("click", () => {
+      const nextTheme =
+        root.getAttribute("data-theme") === "dark" ? "light" : "dark";
+      setTheme(nextTheme);
+    });
+</script>

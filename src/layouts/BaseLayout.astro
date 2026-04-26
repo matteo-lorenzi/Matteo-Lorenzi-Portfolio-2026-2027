@@ -1,0 +1,42 @@
+---
+import type { Locale } from "../i18n";
+import { getTranslations } from "../i18n";
+import Footer from "../components/Footer.astro";
+import Nav from "../components/Nav.astro";
+import SwitchAtmosphere from "../components/SwitchAtmosphere.astro";
+import CursorFollower from "../components/CursorFollower.astro";
+import CurtainTransition from "../components/CurtainTransition.astro";
+import RevealInit from "../components/RevealInit.astro";
+import "../styles/fonts.css";
+import "../styles/global.css";
+
+interface Props {
+  locale: Locale;
+  title?: string;
+}
+
+const { locale, title = "M.L Portfolio" } = Astro.props;
+const t = getTranslations(locale);
+---
+
+<!doctype html>
+<html lang={locale} data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{title}</title>
+  </head>
+  <body>
+    <a href="#main-content" class="skip-link">{t.common.skip}</a>
+    <CurtainTransition />
+    <CursorFollower />
+    <Nav locale={locale} />
+    <main id="main-content" class="pt-12 md:pt-14">
+      <slot />
+    </main>
+    <Footer locale={locale} />
+    <SwitchAtmosphere locale={locale} />
+    <RevealInit />
+  </body>
+</html>

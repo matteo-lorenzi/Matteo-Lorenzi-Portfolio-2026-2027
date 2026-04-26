@@ -1,0 +1,43 @@
+<div id="cursor-follower" class="cursor-follower" aria-hidden="true"></div>
+
+<script>
+  import gsap from "gsap";
+
+  if (!window.matchMedia("(hover: none)").matches) {
+    const cursor = document.getElementById("cursor-follower");
+
+    if (cursor) {
+      const xTo = gsap.quickTo(cursor, "x", { duration: 0.08, ease: "power3" });
+      const yTo = gsap.quickTo(cursor, "y", { duration: 0.08, ease: "power3" });
+
+      window.addEventListener("mousemove", (event) => {
+        xTo(event.clientX - 6);
+        yTo(event.clientY - 6);
+      });
+
+      const interactiveElements = document.querySelectorAll(
+        'a, button, [data-cursor="expand"]',
+      );
+
+      interactiveElements.forEach((element) => {
+        element.addEventListener("mouseenter", () => {
+          gsap.to(cursor, {
+            width: 28,
+            height: 28,
+            duration: 0.2,
+            ease: "power2.out",
+          });
+        });
+
+        element.addEventListener("mouseleave", () => {
+          gsap.to(cursor, {
+            width: 12,
+            height: 12,
+            duration: 0.2,
+            ease: "power2.out",
+          });
+        });
+      });
+    }
+  }
+</script>

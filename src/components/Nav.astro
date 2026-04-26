@@ -1,0 +1,85 @@
+---
+import type { Locale } from "../i18n";
+import { getTranslations } from "../i18n";
+import NavOverlay from "./NavOverlay.astro";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = getTranslations(locale);
+const currentPath = Astro.url.pathname;
+const toEnglishPath = (path: string) => {
+  if (path === "/fr" || path === "/fr/") return "/en/";
+
+  return path
+    .replace(/^\/fr\/a-propos(\/|$)/, "/en/about$1")
+    .replace(/^\/fr\/projets(\/|$)/, "/en/projects$1")
+    .replace(/^\/fr\/experiences(\/|$)/, "/en/experience$1")
+    .replace(/^\/fr\//, "/en/");
+};
+
+const toFrenchPath = (path: string) => {
+  if (path === "/en" || path === "/en/") return "/fr/";
+
+  return path
+    .replace(/^\/en\/about(\/|$)/, "/fr/a-propos$1")
+    .replace(/^\/en\/projects(\/|$)/, "/fr/projets$1")
+    .replace(/^\/en\/experience(\/|$)/, "/fr/experiences$1")
+    .replace(/^\/en\//, "/fr/");
+};
+
+const localeSwitchPath =
+  locale === "fr" ? toEnglishPath(currentPath) : toFrenchPath(currentPath);
+const localeSwitchLabel = locale === "fr" ? "EN" : "FR";
+---
+
+<nav
+  id="main-nav"
+  class="grid-main fixed left-0 top-0 z-[100] w-full !py-8 transition-colors duration-300"
+>
+  <div class="col-content flex items-center justify-between">
+    <a href={locale === "fr" ? "/fr/" : "/en/"} class="text-xl font-bold">M.L</a
+    >
+    <div class="flex items-center gap-4">
+      <a
+        href={localeSwitchPath}
+        class="text-label transition-opacity hover:opacity-70"
+        aria-label={locale === "fr"
+          ? "Switch language to English"
+          : "Changer la langue en français"}
+      >
+        {localeSwitchLabel}
+      </a>
+      <button
+        id="nav-overlay-open"
+        aria-expanded="false"
+        aria-controls="nav-overlay"
+        class="text-label"
+      >
+        {t.nav.menu}
+      </button>
+    </div>
+  </div>
+</nav>
+
+<NavOverlay locale={locale} />
+
+<script>
+  const nav = document.getElementById("main-nav");
+
+  const handleScroll = () => {
+    if (!nav) return;
+    if (window.scrollY > 80) {
+      nav.style.backgroundColor = "var(--color-paper)";
+      nav.style.borderBottom = "0.5px solid var(--color-border)";
+    } else {
+      nav.style.backgroundColor = "transparent";
+      nav.style.borderBottom = "0";
+    }
+  };
+
+  handleScroll();
+  window.addEventListener("scroll", handleScroll, { passive: true });
+</script>

@@ -1,0 +1,67 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import type { Locale } from "../i18n";
+import { getTranslations } from "../i18n";
+
+const locale: Locale = Astro.url.pathname.startsWith("/en/") ? "en" : "fr";
+const t = getTranslations(locale);
+const homePath = locale === "fr" ? "/fr/" : "/en/";
+const projectsPath = locale === "fr" ? "/fr/projets/" : "/en/projects/";
+---
+
+<BaseLayout locale={locale} title={`404 - ${t.notFound.title}`}>
+  <section class="grid-main pb-16 pt-28 md:pt-32">
+    <div
+      class="not-found-panel col-content reveal-item border border-[var(--color-border)] p-6 md:p-10"
+    >
+      <p class="text-label text-[var(--color-ink)]">{t.notFound.kicker}</p>
+      <h1 class="mt-4 text-display">404</h1>
+      <h2 class="mt-3 text-subheading text-[var(--color-ink)]">
+        {t.notFound.title}
+      </h2>
+      <p class="mt-6 max-w-[68ch] text-body">{t.notFound.description}</p>
+
+      <div class="mt-10 flex flex-wrap gap-3">
+        <a
+          href={homePath}
+          class="inline-block border border-[var(--color-ink)] px-4 py-2 text-label text-[var(--color-ink)] transition-colors hover:bg-[var(--color-ink)] hover:text-[var(--color-paper)]"
+        >
+          {t.notFound.primaryCta}
+        </a>
+        <a
+          href={projectsPath}
+          class="inline-block border border-[var(--color-border)] px-4 py-2 text-label text-[var(--color-ink)] transition-colors hover:border-[var(--color-ink)]"
+        >
+          {t.notFound.secondaryCta}
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    import gsap from "gsap";
+
+    const panel = document.querySelector(".not-found-panel");
+
+    const animatePanel = () => {
+      if (!panel) return;
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+      gsap.fromTo(
+        panel,
+        { y: 24, opacity: 0, scale: 0.985 },
+        {
+          y: 0,
+          opacity: 1,
+          scale: 1,
+          duration: 0.75,
+          delay: 0.08,
+          ease: "power3.out",
+        },
+      );
+    };
+
+    document.addEventListener("astro:page-load", animatePanel);
+    window.addEventListener("load", animatePanel);
+  </script>
+</BaseLayout>
