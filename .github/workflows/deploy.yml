@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true  # Fix Node.js 20 deprecation warnings
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 permissions:
   contents: read
@@ -35,24 +35,25 @@ jobs:
         run: npm ci
 
       - name: Compute Astro site/base for GH Pages
+        id: pages_vars
         shell: bash
         run: |
           owner="${GITHUB_REPOSITORY_OWNER}"
           repo="${GITHUB_REPOSITORY#*/}"
 
           if [[ "${repo}" == "${owner}.github.io" ]]; then
-            echo "SITE_URL=https://${owner}.github.io" >> "$GITHUB_ENV"
-            echo "BASE_PATH=/" >> "$GITHUB_ENV"
+            echo "site_url=https://${owner}.github.io" >> "$GITHUB_OUTPUT"
+            echo "base_path=/" >> "$GITHUB_OUTPUT"
           else
-            echo "SITE_URL=https://${owner}.github.io/${repo}" >> "$GITHUB_ENV"  # ← was missing /${repo}
-            echo "BASE_PATH=/${repo}/" >> "$GITHUB_ENV"  # ← trailing slash required by Astro
+            echo "site_url=https://${owner}.github.io/${repo}" >> "$GITHUB_OUTPUT"
+            echo "base_path=/${repo}/" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Build
         run: npm run build
         env:
-          SITE: ${{ env.SITE_URL }}      # ← pass vars into the build
-          BASE: ${{ env.BASE_PATH }}     # ← pass vars into the build
+          SITE: ${{ steps.pages_vars.outputs.site_url }}
+          BASE: ${{ steps.pages_vars.outputs.base_path }}
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
