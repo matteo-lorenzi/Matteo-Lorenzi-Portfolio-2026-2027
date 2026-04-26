@@ -55,10 +55,7 @@ export const t = {
     send: "Envoyer",
     emailLabel: "Email",
     nameLabel: "Nom",
-    messageLabel: "Message",
-    setupHint:
-      "Configurez PUBLIC_FORMSPREE_ENDPOINT dans votre fichier .env pour activer l'envoi du formulaire.",
-  },
+    messageLabel: "Message",  },
   footer: {
     copyright: "© 2026 M.L",
     legal: "Mentions légales",

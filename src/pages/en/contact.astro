@@ -46,11 +46,6 @@ import { formspreeEndpoint, isFormspreeConfigured } from "../../config/runtime";
             >{t.contact.send}</button
           >
         </form>
-        {
-          !isFormspreeConfigured && (
-            <p class="text-label">{t.contact.setupHint}</p>
-          )
-        }
         <a
           href="/cv.pdf"
           class="inline-block w-fit border border-[var(--color-ink)] px-4 py-2 text-label"

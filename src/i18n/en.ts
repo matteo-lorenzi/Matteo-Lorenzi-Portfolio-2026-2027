@@ -42,8 +42,6 @@ export const t = {
     emailLabel: "Email",
     nameLabel: "Name",
     messageLabel: "Message",
-    setupHint:
-      "Set PUBLIC_FORMSPREE_ENDPOINT in your .env file to enable form submissions.",
   },
   footer: {
     copyright: "© 2026 M.L",
