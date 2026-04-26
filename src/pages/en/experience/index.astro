@@ -34,7 +34,7 @@ const experiences = (await getCollection("experiences")).sort(
                 index % 3 === 0 ? "md:col-span-2" : "md:col-span-1",
               ]}
             >
-              <article aria-labelledby={`experience-title-${item.slug}`}>
+              <article aria-labelledby={`experience-title-${item.id}`}>
                 <div class="flex flex-wrap items-center gap-3">
                   <p class="text-label text-[var(--color-ink)]">
                     {item.data.period}
@@ -44,7 +44,7 @@ const experiences = (await getCollection("experiences")).sort(
                   </span>
                 </div>
                 <h2
-                  id={`experience-title-${item.slug}`}
+                  id={`experience-title-${item.id}`}
                   class="mt-4 text-subheading text-[var(--color-ink)]"
                 >
                   {item.data.role_en}

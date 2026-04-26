@@ -6,7 +6,7 @@ import ProjectTemplate from "../../../components/ProjectTemplate.astro";
 export async function getStaticPaths() {
   const projects = await getCollection("projects");
   return projects.map((project) => ({
-    params: { slug: project.slug },
+    params: { slug: project.id.replace(/\.md$/, "") },
     props: { project },
   }));
 }
@@ -16,7 +16,7 @@ const orderedProjects = (await getCollection("projects")).sort(
   (a, b) => a.data.order - b.data.order,
 );
 const currentIndex = orderedProjects.findIndex(
-  (entry) => entry.slug === project.slug,
+  (entry) => entry.id === project.id,
 );
 const indexLabel = `[ ${String(currentIndex + 1).padStart(2, "0")} / ${String(orderedProjects.length).padStart(2, "0")} ]`;
 const previous =

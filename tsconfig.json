@@ -1,7 +1,7 @@
 {
   "extends": "astro/tsconfigs/strict",
   "include": [".astro/types.d.ts", "**/*"],
-  "exclude": ["dist", "src/components/ModelViewer.tsx"],
+  "exclude": ["dist", "node_modules", "src/components/ModelViewer.tsx"],
   "compilerOptions": {
     "types": ["node"]
   }

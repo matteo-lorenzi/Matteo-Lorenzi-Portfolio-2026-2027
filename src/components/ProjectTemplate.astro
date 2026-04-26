@@ -20,6 +20,8 @@ const quote = locale === "fr" ? project.data.quote_fr : project.data.quote_en;
 const role = locale === "fr" ? project.data.role_fr : project.data.role_en;
 const basePath = locale === "fr" ? "/fr/projets/" : "/en/projects/";
 const listPath = locale === "fr" ? "/fr/projets/" : "/en/projects/";
+const previousPath = previous?.id.replace(/\.md$/, "");
+const nextPath = next?.id.replace(/\.md$/, "");
 ---
 
 <article class="grid-main pb-24 pt-28 md:pt-32">
@@ -89,7 +91,7 @@ const listPath = locale === "fr" ? "/fr/projets/" : "/en/projects/";
     {
       previous ? (
         <a
-          href={`${basePath}${previous.slug}/`}
+          href={`${basePath}${previousPath}/`}
           class="project-detail-nav-link md:justify-self-start"
         >
           {t.projectDetail.prev}
@@ -104,7 +106,7 @@ const listPath = locale === "fr" ? "/fr/projets/" : "/en/projects/";
     {
       next ? (
         <a
-          href={`${basePath}${next.slug}/`}
+          href={`${basePath}${nextPath}/`}
           class="project-detail-nav-link md:justify-self-end"
         >
           {t.projectDetail.next}

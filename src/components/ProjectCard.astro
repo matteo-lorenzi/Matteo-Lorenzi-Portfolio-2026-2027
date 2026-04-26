@@ -8,10 +8,11 @@ interface Props {
 
 const { project, locale } = Astro.props;
 const basePath = locale === "fr" ? "/fr/projets/" : "/en/projects/";
+const projectPath = project.id.replace(/\.md$/, "");
 ---
 
 <a
-  href={`${basePath}${project.slug}/`}
+  href={`${basePath}${projectPath}/`}
   class="project-card reveal-item block border border-[var(--color-border)] transition duration-300 hover:border-[var(--color-ink)]"
 >
   <div class="project-card__media overflow-hidden">
