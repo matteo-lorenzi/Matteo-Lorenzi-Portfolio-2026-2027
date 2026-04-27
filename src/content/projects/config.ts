@@ -8,6 +8,7 @@ export const projectsCollection = defineCollection({
     category: z.enum(["Branding", "UI/UX", "Motion", "Print", "Illustration"]),
     tags: z.array(z.string()),
     cover: z.string(),
+    video_url: z.string().url().optional(),
     images: z.array(z.string()).optional(),
     description_fr: z.string(),
     description_en: z.string(),

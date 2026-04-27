@@ -28,6 +28,7 @@ export const t = {
     role: "Role",
     tools: "Tools",
     year: "Year",
+    watchVideo: "Watch project video",
     quoteLabel: "Project insight",
     navLabel: "Project navigation",
     prev: "← Prev Project",

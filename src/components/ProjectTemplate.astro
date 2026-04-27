@@ -2,7 +2,6 @@
 import type { CollectionEntry } from "astro:content";
 import type { Locale } from "../i18n";
 import { getTranslations } from "../i18n";
-import ImageSlices from "./ImageSlices.astro";
 
 interface Props {
   project: CollectionEntry<"projects">;
@@ -18,6 +17,7 @@ const description =
   locale === "fr" ? project.data.description_fr : project.data.description_en;
 const quote = locale === "fr" ? project.data.quote_fr : project.data.quote_en;
 const role = locale === "fr" ? project.data.role_fr : project.data.role_en;
+const videoUrl = project.data.video_url;
 const basePath = locale === "fr" ? "/fr/projets/" : "/en/projects/";
 const listPath = locale === "fr" ? "/fr/projets/" : "/en/projects/";
 const previousPath = previous?.id.replace(/\.md$/, "");
@@ -45,11 +45,32 @@ const nextPath = next?.id.replace(/\.md$/, "");
   }
 
   <div class="col-full mt-12 reveal-item">
-    <ImageSlices
-      src={project.data.cover}
-      alt={project.data.title}
-      slices={10}
-    />
+    {
+      videoUrl ? (
+        <a
+          href={videoUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="block"
+          aria-label={t.projectDetail.watchVideo}
+        >
+          <img
+            src={project.data.cover}
+            alt={project.data.title}
+            class="aspect-[16/9] w-full object-cover grayscale transition duration-300 hover:grayscale-0"
+            loading="eager"
+          />
+          <p class="mt-3 text-label">{t.projectDetail.watchVideo}</p>
+        </a>
+      ) : (
+        <img
+          src={project.data.cover}
+          alt={project.data.title}
+          class="aspect-[16/9] w-full object-cover grayscale"
+          loading="eager"
+        />
+      )
+    }
   </div>
 
   <div class="col-left mt-12 reveal-item">
