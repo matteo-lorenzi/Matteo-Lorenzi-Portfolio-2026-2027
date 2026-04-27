@@ -55,7 +55,8 @@ export const t = {
     send: "Envoyer",
     emailLabel: "Email",
     nameLabel: "Nom",
-    messageLabel: "Message",  },
+    messageLabel: "Message",
+  },
   footer: {
     copyright: "© 2026 M.L",
     legal: "Mentions légales",
@@ -73,7 +74,7 @@ export const t = {
     title: "Expérience professionnelle",
     kicker: "Parcours",
     intro:
-      "Une galerie de mes expériences de terrain : mission, contexte, responsabilités et impact produit.",
+      "Une galerie de mes expériences de terrain : mission, contexte et responsabilités.",
     count: (n: number) => `[ ${n} expériences ]`,
   },
   notFound: {
@@ -88,22 +89,22 @@ export const t = {
     title: "À propos",
     kicker: "Profil",
     intro:
-      "Je suis Matteo Lorenzi, étudiant en informatique passionné par le développement web et le design moderne.",
+      "Je suis Matteo Lorenzi, étudiant en informatique passionné par le développement web et le design.",
     personalInfo: {
       name: "Matteo Lorenzi",
       title: "Étudiant Développeur",
       description:
-        "Je suis Matteo Lorenzi, étudiant en informatique passionné par le développement web et le design moderne. J'aime créer des expériences utilisateur innovantes et esthétiques qui combinent fonctionnalité et élégance visuelle.",
+        "Je m'appelle Matteo Lorenzi, étudiant en informatique. Le développement web, j'y suis tombé dedans un peu par hasard et je n'en suis jamais vraiment ressorti. Ce qui me plaie le plus c'est la frontière entre le code et le design — ce moment où une interface fusionne esthétique et fonctionnalité. Je ne sais pas toujours trouver le bon équilibre, mais c'est ce que j'essaie de comprendre.",
       initials: "ML",
       githubUrl: "https://github.com/matteo-lorenzi",
       githubLabel: "Voir mon GitHub",
     },
     profileTitle: "Positionnement",
     profile:
-      "Je conçois des expériences utilisateur innovantes et esthétiques qui combinent fonctionnalité et élégance visuelle.",
+      "J'aime construire des interfaces inspirante et modernes, avec une attention particulière à la hiérarchie visuelle, la typographie et les systèmes de couleurs. Je crois que le design doit être au service de l'utilisateur, en rendant les interactions intuitives et agréables. Mon approche est centrée sur la compréhension des besoins des utilisateurs et la création de solutions qui répondent à ces besoins tout en étant esthétiquement plaisantes.",
     statsTitle: "Chiffres",
     profileStats: [
-      { number: "3+", label: "Années d'études" },
+      { number: "4+", label: "Années d'études" },
       { number: "10+", label: "Projets réalisés" },
     ],
     skillsTitle: "Compétences",
@@ -121,14 +122,15 @@ export const t = {
         skills: ["Figma", "UI/UX", "Git/GitHub", "VS Code", "Vite"],
       },
     ],
-    approachTitle: "Approche",
+    approachTitle: "Ce que j'aime vraiment faire",
     approach:
-      "Chaque projet commence par une phase de compréhension : objectifs, contraintes, public et contexte. Je traduis ensuite ces éléments en parcours clairs, systèmes visuels cohérents et prototypes testables.",
-    valuesTitle: "Ce qui me guide",
+      "Construire des interfaces où le code et le design se tiennent. Pas juste que ça soit beau, pas juste que ça fonctionne — que les deux soient liés. C'est le genre de problème sur lequel je peux rester bloqué deux heures sans m'en rendre compte.",
+
+    valuesTitle: "Ce que je n'aime pas faire",
     values: [
-      "Simplicité d'usage avant tout",
-      "Identité visuelle forte et utile",
-      "Méthodologie collaborative et itérative",
+      "Livrer quelque chose que je ne comprends pas moi-même",
+      "Ignorer la typographie parce que 'c'est du détail'",
+      "Commencer à coder avant d'avoir une idée claire de ce qu'on construit",
     ],
     toolsTitle: "Outils",
     tools: "Figma, suite Adobe, GSAP, HTML/CSS, JavaScript",
