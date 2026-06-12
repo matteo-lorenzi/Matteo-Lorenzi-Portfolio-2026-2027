@@ -22,3 +22,12 @@ pnpm-debug.log*
 
 # jetbrains setting folder
 .idea/
+
+# AI tooling (local, non versionné — propre à cette machine)
+.claude/
+.agents/
+.graphifyignore
+skills-lock.json
+graphify-out/
+CLAUDE.md
+docs/agents/
