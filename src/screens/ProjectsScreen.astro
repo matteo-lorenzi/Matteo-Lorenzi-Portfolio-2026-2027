@@ -1,0 +1,279 @@
+---
+import type { Locale } from "../i18n";
+import { getTranslations } from "../i18n";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { getCollection } from "astro:content";
+import ProjectCard from "../components/ProjectCard.astro";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = getTranslations(locale);
+
+const projects = (await getCollection("projects")).sort(
+  (a, b) => a.data.order - b.data.order,
+);
+const normalizeCategory = (category: string) =>
+  category.toLowerCase().replace(/[^a-z]/g, "");
+---
+
+<BaseLayout locale={locale} title={`${t.projects.title} - M.L`}>
+  <section class="grid-main pb-16 pt-20 md:pt-24 lg:pt-32">
+    <div class="col-content space-y-16 projects-shell" data-project-view="grid">
+      <header
+        class="reveal-item border-b border-[var(--color-border)] pb-12 space-y-6"
+      >
+        <div class="space-y-3">
+          <h1 class="text-heading">{t.projects.title}</h1>
+          <p class="text-label">{t.projects.count(projects.length)}</p>
+        </div>
+        <div class="flex flex-wrap items-center gap-2">
+          <span class="text-label pr-2">{t.projects.view}</span>
+          <button
+            type="button"
+            class="project-view-button border border-[var(--color-border)] px-2 py-1 text-label transition-colors"
+            data-project-view-option="grid"
+            aria-pressed="true"
+          >
+            {t.projects.grid}
+          </button>
+          <button
+            type="button"
+            class="project-view-button border border-[var(--color-border)] px-2 py-1 text-label transition-colors"
+            data-project-view-option="list"
+            aria-pressed="false"
+          >
+            {t.projects.list}
+          </button>
+          <button
+            type="button"
+            class="project-view-button border border-[var(--color-border)] px-2 py-1 text-label transition-colors"
+            data-project-view-option="compact"
+            aria-pressed="false"
+          >
+            {t.projects.compact}
+          </button>
+        </div>
+        <div class="flex flex-wrap gap-2">
+          <button
+            type="button"
+            class="project-filter-button border border-[var(--color-border)] px-2 py-1 text-label transition-colors"
+            data-project-filter-option="all"
+            aria-pressed="true"
+          >
+            {t.projects.all}
+          </button>
+          <button
+            type="button"
+            class="project-filter-button border border-[var(--color-border)] px-2 py-1 text-label transition-colors"
+            data-project-filter-option="branding"
+            aria-pressed="false"
+          >
+            {t.projects.branding}
+          </button>
+          <button
+            type="button"
+            class="project-filter-button border border-[var(--color-border)] px-2 py-1 text-label transition-colors"
+            data-project-filter-option="uiux"
+            aria-pressed="false"
+          >
+            {t.projects.uiux}
+          </button>
+          <button
+            type="button"
+            class="project-filter-button border border-[var(--color-border)] px-2 py-1 text-label transition-colors"
+            data-project-filter-option="motion"
+            aria-pressed="false"
+          >
+            {t.projects.motion}
+          </button>
+          <button
+            type="button"
+            class="project-filter-button border border-[var(--color-border)] px-2 py-1 text-label transition-colors"
+            data-project-filter-option="print"
+            aria-pressed="false"
+          >
+            {t.projects.print}
+          </button>
+          <button
+            type="button"
+            class="project-filter-button border border-[var(--color-border)] px-2 py-1 text-label transition-colors"
+            data-project-filter-option="illustration"
+            aria-pressed="false"
+          >
+            {t.projects.illustration}
+          </button>
+        </div>
+        <div class="projects-grid">
+          {
+            projects.map((project) => (
+              <div
+                class="project-filter-item"
+                data-project-category={normalizeCategory(project.data.category)}
+              >
+                <ProjectCard project={project} locale={locale} />
+              </div>
+            ))
+          }
+        </div>
+      </header>
+    </div>
+
+    <script>
+      // @ts-nocheck
+      const storageKey = "portfolio-project-view";
+      /** @type {NodeListOf<HTMLElement>} */
+      const shells = document.querySelectorAll(".projects-shell");
+
+      /**
+       * @param {HTMLElement} shell
+       * @param {string} view
+       */
+      const applyView = (shell, view) => {
+        shell.dataset.projectView = view;
+
+        /** @type {NodeListOf<HTMLButtonElement>} */
+        const buttons = shell.querySelectorAll("[data-project-view-option]");
+        buttons.forEach((button) => {
+          const active =
+            button.getAttribute("data-project-view-option") === view;
+          button.setAttribute("aria-pressed", String(active));
+        });
+      };
+
+      /**
+       * @param {HTMLElement} shell
+       * @param {string} filter
+       */
+      const applyFilter = (shell, filter) => {
+        /** @type {NodeListOf<HTMLElement>} */
+        const items = shell.querySelectorAll(".project-filter-item");
+        /** @type {NodeListOf<HTMLButtonElement>} */
+        const buttons = shell.querySelectorAll("[data-project-filter-option]");
+
+        items.forEach((item) => {
+          const category = item.dataset.projectCategory;
+          const isVisible = filter === "all" || category === filter;
+          item.toggleAttribute("hidden", !isVisible);
+        });
+
+        buttons.forEach((button) => {
+          const active =
+            button.getAttribute("data-project-filter-option") === filter;
+          button.setAttribute("aria-pressed", String(active));
+        });
+      };
+
+      const savedView = window.localStorage.getItem(storageKey);
+      const initialView =
+        savedView === "list" || savedView === "compact" ? savedView : "grid";
+
+      shells.forEach((shell) => {
+        applyView(shell, initialView);
+
+        /** @type {NodeListOf<HTMLButtonElement>} */
+        const buttons = shell.querySelectorAll("[data-project-view-option]");
+        /** @type {NodeListOf<HTMLButtonElement>} */
+        const filterButtons = shell.querySelectorAll(
+          "[data-project-filter-option]",
+        );
+
+        applyFilter(shell, "all");
+
+        buttons.forEach((button) => {
+          button.addEventListener("click", () => {
+            const view = button.getAttribute("data-project-view-option");
+
+            if (!view) return;
+
+            window.localStorage.setItem(storageKey, view);
+            applyView(shell, view);
+          });
+        });
+
+        filterButtons.forEach((button) => {
+          button.addEventListener("click", () => {
+            const filter = button.getAttribute("data-project-filter-option");
+            if (!filter) return;
+            applyFilter(shell, filter);
+          });
+        });
+      });
+    </script>
+
+    <style is:global>
+      .projects-shell .project-view-button[aria-pressed="true"] {
+        background: var(--color-ink);
+        color: var(--color-paper);
+        border-color: var(--color-ink);
+      }
+
+      .projects-shell .project-filter-button[aria-pressed="true"] {
+        background: var(--color-ink);
+        color: var(--color-paper);
+        border-color: var(--color-ink);
+      }
+
+      .projects-shell[data-project-view="grid"] .projects-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 1.5rem;
+      }
+
+      .projects-shell[data-project-view="list"] .projects-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1rem;
+      }
+
+      .projects-shell[data-project-view="compact"] .projects-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 1rem;
+      }
+
+      .projects-shell[data-project-view="list"] .project-card {
+        display: grid;
+        grid-template-columns: minmax(220px, 320px) minmax(0, 1fr);
+        align-items: stretch;
+      }
+
+      .projects-shell[data-project-view="list"] .project-card__media,
+      .projects-shell[data-project-view="list"] .project-card__media img {
+        height: 100%;
+      }
+
+      .projects-shell[data-project-view="list"] .project-card__image {
+        aspect-ratio: auto;
+      }
+
+      .projects-shell[data-project-view="list"] .project-card__content {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+      }
+
+      .projects-shell[data-project-view="compact"] .project-card__content {
+        padding: 1rem;
+      }
+
+      .projects-shell[data-project-view="compact"] .project-card h2 {
+        font-size: 1.25rem;
+      }
+
+      @media (max-width: 767px) {
+        .projects-shell[data-project-view="grid"] .projects-grid,
+        .projects-shell[data-project-view="compact"] .projects-grid,
+        .projects-shell[data-project-view="list"] .projects-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .projects-shell[data-project-view="list"] .project-card {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </section>
+</BaseLayout>
