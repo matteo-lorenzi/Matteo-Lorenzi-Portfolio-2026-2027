@@ -169,6 +169,6 @@ export const t = {
     ],
     ctaLabel: "Parlons de votre projet",
   },
-} as const;
+};
 
 export type Translations = typeof t;
