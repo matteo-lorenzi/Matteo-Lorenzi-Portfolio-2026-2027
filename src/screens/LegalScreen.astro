@@ -1,0 +1,23 @@
+---
+import type { Locale } from "../i18n";
+import { getTranslations } from "../i18n";
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = getTranslations(locale);
+const pageTitle =
+  locale === "fr" ? "Mentions legales - M.L" : "Legal notice - M.L";
+---
+
+<BaseLayout locale={locale} title={pageTitle}>
+  <section class="grid-main py-16">
+    <div class="col-content space-y-4 reveal-item">
+      <h1 class="text-heading">{t.legal.title}</h1>
+      <p class="text-body">{t.legal.body}</p>
+    </div>
+  </section>
+</BaseLayout>
