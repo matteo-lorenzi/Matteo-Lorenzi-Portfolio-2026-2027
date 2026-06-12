@@ -9,7 +9,21 @@ export const t = {
     close: "Close",
   },
   common: { skip: "Skip to main content" },
-  hero: { title: "M.L", role: "UI/UX Designer", scroll: "Scroll" },
+  hero: {
+    title: "M.L",
+    name: "Matteo Lorenzi",
+    role: "UI/UX Designer",
+    scroll: "Scroll",
+  },
+  landing: {
+    kicker: "Home",
+    title: "Welcome",
+    subtitle: "Feel free to explore my portfolio.",
+    modelSrc: "",
+    modelAlt: "3D preview of the portfolio",
+    modelFallback:
+      "Add a .glb model in /public/models then set landing.modelSrc.",
+  },
   projects: {
     title: "Projects",
     all: "All",
