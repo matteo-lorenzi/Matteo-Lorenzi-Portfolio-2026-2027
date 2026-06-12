@@ -1,6 +1,7 @@
 <script>
   import gsap from "gsap";
   import ScrollTrigger from "gsap/ScrollTrigger";
+  import { cssDurationSeconds } from "../scripts/motion";
 
   if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
     gsap.registerPlugin(ScrollTrigger);
@@ -12,7 +13,7 @@
         {
           y: 0,
           opacity: 1,
-          duration: 0.8,
+          duration: cssDurationSeconds("--duration-slow", 0.8),
           ease: "power3.out",
           scrollTrigger: {
             trigger: element,

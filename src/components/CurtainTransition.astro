@@ -80,9 +80,18 @@
 
 <script>
   import gsap from "gsap";
+  import { cssDurationSeconds } from "../scripts/motion";
 
   const curtain = document.getElementById("curtain-transition");
-  const MIN_LOADER_DURATION = 1000; // Durée minimale du loader en ms
+  // GSAP n'est pas couvert par la règle CSS prefers-reduced-motion :
+  // rideau instantané et pas de loader minimal pour ces utilisateurs
+  const REDUCED_MOTION = window.matchMedia(
+    "(prefers-reduced-motion: reduce)",
+  ).matches;
+  const CURTAIN_DURATION = REDUCED_MOTION
+    ? 0
+    : cssDurationSeconds("--duration-base", 0.4);
+  const MIN_LOADER_DURATION = REDUCED_MOTION ? 0 : 1000; // Durée minimale du loader en ms
   const MAX_BLOCK_DURATION = 3000; // Securite anti-blocage
 
   let loaderStartTime = Date.now();
@@ -107,7 +116,7 @@
       gsap.set(curtain, { transformOrigin: "top" });
       gsap.to(curtain, {
         scaleY: 0,
-        duration: 0.4,
+        duration: CURTAIN_DURATION,
         ease: "power2.out",
         onComplete: () => {
           gsap.set(curtain, { pointerEvents: "none" });
@@ -127,7 +136,11 @@
       window.clearTimeout(forceRevealTimer);
     }
     gsap.set(curtain, { transformOrigin: "bottom", pointerEvents: "auto" });
-    gsap.to(curtain, { scaleY: 1, duration: 0.4, ease: "power2.in" });
+    gsap.to(curtain, {
+      scaleY: 1,
+      duration: CURTAIN_DURATION,
+      ease: "power2.in",
+    });
 
     // Si un event Astro manque, on evite de rester bloque sur le loader
     forceRevealTimer = window.setTimeout(() => {
