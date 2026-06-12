@@ -1,4 +1,6 @@
-export const t = {
+import type { Translations } from "./fr";
+
+export const t: Translations = {
   locale: "en",
   nav: {
     projects: "Projects",
@@ -169,4 +171,4 @@ export const t = {
     ],
     ctaLabel: "Let us discuss your project",
   },
-} as const;
+};
