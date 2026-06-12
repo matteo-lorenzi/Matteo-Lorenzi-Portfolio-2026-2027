@@ -1,38 +1,10 @@
 ---
-import { getCollection } from "astro:content";
-import BaseLayout from "../../../layouts/BaseLayout.astro";
-import ProjectTemplate from "../../../components/ProjectTemplate.astro";
+import ProjectDetailScreen from "../../../screens/ProjectDetailScreen.astro";
+import { getProjectStaticPaths } from "../../../screens/projectPaths";
 
-export async function getStaticPaths() {
-  const projects = await getCollection("projects");
-  return projects.map((project) => ({
-    params: { slug: project.id.replace(/\.md$/, "") },
-    props: { project },
-  }));
-}
+export const getStaticPaths = getProjectStaticPaths;
 
 const { project } = Astro.props;
-const orderedProjects = (await getCollection("projects")).sort(
-  (a, b) => a.data.order - b.data.order,
-);
-const currentIndex = orderedProjects.findIndex(
-  (entry) => entry.id === project.id,
-);
-const indexLabel = `[ ${String(currentIndex + 1).padStart(2, "0")} / ${String(orderedProjects.length).padStart(2, "0")} ]`;
-const previous =
-  currentIndex > 0 ? orderedProjects[currentIndex - 1] : undefined;
-const next =
-  currentIndex < orderedProjects.length - 1
-    ? orderedProjects[currentIndex + 1]
-    : undefined;
 ---
 
-<BaseLayout locale="fr" title={`${project.data.title} - M.L`}>
-  <ProjectTemplate
-    project={project}
-    locale="fr"
-    indexLabel={indexLabel}
-    previous={previous}
-    next={next}
-  />
-</BaseLayout>
+<ProjectDetailScreen locale="fr" project={project} />
