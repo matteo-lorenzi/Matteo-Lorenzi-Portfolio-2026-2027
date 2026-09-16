@@ -14,7 +14,7 @@ export const t: Translations = {
   hero: {
     title: "M.L",
     name: "Matteo Lorenzi",
-    role: "UI/UX Designer",
+    role: "Web Editorial and UX Strategy Student",
     scroll: "Scroll",
   },
   landing: {

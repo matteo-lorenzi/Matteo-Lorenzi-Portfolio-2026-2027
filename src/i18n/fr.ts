@@ -12,7 +12,7 @@ export const t = {
   hero: {
     title: "M.L",
     name: "Matteo Lorenzi",
-    role: "UI/UX Designer",
+    role: "Étudiant en Web éditorial et Stratégie UX",
     scroll: "Défiler",
   },
   landing: {
