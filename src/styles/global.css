@@ -15,6 +15,37 @@
   --spacing-xl: 120px;
   --spacing-2xl: 200px;
   --grid-gutter: 24px;
+
+  /* Animation timing */
+  --duration-instant: 100ms;
+  --duration-fast: 200ms;
+  --duration-base: 400ms;
+  --duration-slow: 800ms;
+  --duration-cinematic: 1200ms;
+  --ease-editorial: cubic-bezier(0.16, 1, 0.3, 1); /* ease out expo */
+  --ease-reveal: cubic-bezier(0.77, 0, 0.18, 1); /* ease in-out quart */
+
+  /* Typographie fluide (fluid type scale) */
+  --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+  --text-sm: clamp(0.875rem, 0.8rem + 0.375vw, 1rem);
+  --text-base: clamp(1rem, 0.9rem + 0.5vw, 1.125rem);
+  --text-lg: clamp(1.125rem, 1rem + 0.625vw, 1.25rem);
+  --text-xl: clamp(1.25rem, 1.1rem + 0.75vw, 1.5rem);
+  --text-2xl: clamp(1.5rem, 1.2rem + 1.5vw, 2rem);
+  --text-3xl: clamp(2rem, 1.5rem + 2.5vw, 3rem);
+  --text-4xl: clamp(2.5rem, 1.8rem + 3.5vw, 4.5rem);
+  --text-hero: clamp(3rem, 2rem + 5vw, 7rem);
+
+  /* Spacing 8px grid */
+  --space-1: 0.5rem; /* 8px */
+  --space-2: 1rem; /* 16px */
+  --space-3: 1.5rem; /* 24px */
+  --space-4: 2rem; /* 32px */
+  --space-6: 3rem; /* 48px */
+  --space-8: 4rem; /* 64px */
+  --space-12: 6rem; /* 96px */
+  --space-16: 8rem; /* 128px */
+  --space-24: 12rem; /* 192px */
 }
 
 [data-theme="dark"] {
@@ -22,7 +53,8 @@
   --color-paper: #0a0a0a;
   --color-paper-warm: #111111;
   --color-cream: #1a1a1a;
-  --color-muted: #666666;
+  /* 5.9:1 sur --color-paper — WCAG 1.4.3 exige >= 4.5:1 pour le texte normal */
+  --color-muted: #8c8c8c;
   --color-border: rgba(255, 255, 255, 0.1);
 }
 
@@ -31,7 +63,8 @@
   --color-paper: #ffffff;
   --color-paper-warm: #f2f2f2;
   --color-cream: #e8e4dc;
-  --color-muted: #888888;
+  /* 5.1:1 sur --color-paper — WCAG 1.4.3 exige >= 4.5:1 pour le texte normal */
+  --color-muted: #6e6e6e;
   --color-border: rgba(0, 0, 0, 0.1);
 }
 
@@ -151,7 +184,53 @@ textarea:focus-visible {
 }
 
 .tag-radius {
-  border-radius: 2px;
+  /* règle de design : border-radius strictement zéro */
+  border-radius: 0;
+}
+
+/* CTA — underline animé + shimmer monochrome (transform/opacity uniquement) */
+.cta-animated {
+  position: relative;
+  overflow: hidden;
+}
+
+.cta-animated::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    105deg,
+    transparent 35%,
+    color-mix(in srgb, var(--color-ink) 14%, transparent) 50%,
+    transparent 65%
+  );
+  transform: translateX(-101%);
+  transition: transform var(--duration-slow) var(--ease-editorial);
+  pointer-events: none;
+}
+
+.cta-animated:hover::before,
+.cta-animated:focus-visible::before {
+  transform: translateX(101%);
+}
+
+.cta-animated::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 2px;
+  /* currentColor : reste visible quand le CTA inverse son fond au hover */
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform var(--duration-base) var(--ease-editorial);
+}
+
+.cta-animated:hover::after,
+.cta-animated:focus-visible::after {
+  transform: scaleX(1);
 }
 
 .reveal-item {
@@ -222,6 +301,15 @@ textarea:focus-visible {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
   .reveal-item {
     opacity: 1;
     transform: none;

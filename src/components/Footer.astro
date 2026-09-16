@@ -23,7 +23,12 @@ const legalPath =
     >
       {t.footer.backToTop} ↑
     </button>
-    <div class="flex flex-wrap gap-4 md:justify-center">
+    <nav
+      aria-label={locale === "fr"
+        ? "Navigation pied de page"
+        : "Footer navigation"}
+      class="flex flex-wrap gap-4 md:justify-center"
+    >
       <a
         href="https://www.linkedin.com/in/matteo-lorenzi-iut2/?locale=fr"
         target="_blank"
@@ -35,7 +40,7 @@ const legalPath =
         rel="noreferrer">GitHub</a
       >
       <a href={legalPath}>{t.footer.legal}</a>
-    </div>
+    </nav>
   </div>
 </footer>
 

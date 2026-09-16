@@ -26,6 +26,21 @@ const t = getTranslations(locale);
     <meta name="viewport" content="width=device-width" />
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
+    <noscript>
+      <style>
+        /* Sans JS : le rideau (levé par GSAP) et les états initiaux d'animation
+           rendraient la page invisible — neutralisés ici.
+           !important requis : les styles scopés Astro ([data-astro-cid])
+           ont une spécificité supérieure à un simple sélecteur de classe */
+        .curtain-transition {
+          display: none !important;
+        }
+        .reveal-item {
+          opacity: 1 !important;
+          transform: none !important;
+        }
+      </style>
+    </noscript>
   </head>
   <body>
     <a href="#main-content" class="skip-link">{t.common.skip}</a>
