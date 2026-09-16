@@ -279,32 +279,78 @@ textarea:focus-visible {
   transform: scaleX(1);
 }
 
-.project-quote {
-  position: relative;
-  border-left: 2px solid var(--color-ink);
-  background: color-mix(in srgb, var(--color-paper-warm) 85%, transparent);
-  padding: var(--spacing-sm) var(--spacing-md);
+/* Titre de page projet : .text-display plafonne à 180px, calibré pour les deux
+   caractères de "M.L" sur l'accueil. Un titre de projet est bien plus long. */
+.text-display--project {
+  font-size: clamp(40px, 9vw, 120px);
 }
 
-.project-quote blockquote {
-  margin: 0;
+/* Fiche signalétique. auto-fit plutôt que des colonnes fixes : la grille passe
+   de 4 à 2 à 1 cellule sans media query, et survit à l'effondrement des .col-*
+   à 1024px. Le min() évite le débordement horizontal sous 400px. */
+.project-fiche {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(200px, 100%), 1fr));
+  gap: var(--space-3);
+  border-block: 1px solid var(--color-border);
+  padding-block: var(--space-4);
 }
 
-.project-quote blockquote::before {
-  content: '"';
-  display: block;
-  font-family: var(--font-display);
-  font-size: clamp(28px, 4vw, 48px);
-  font-weight: 700;
-  line-height: 1;
+.project-fiche dd {
+  margin: var(--space-1) 0 0;
+  /* Pleine encre, pas --color-muted : ce sont les faits porteurs de la page. */
   color: var(--color-ink);
-  opacity: 0.7;
-  margin-bottom: 8px;
+  font-family: var(--font-display);
+  font-size: clamp(15px, 1.2vw, 18px);
+  font-weight: 300;
+  line-height: 1.6;
 }
 
-.project-quote .text-subheading {
-  max-width: 34ch;
-  line-height: 1.35;
+/* Prose de l'étude de cas. Aucun plugin typography n'est installé
+   (tailwind.config.cjs : plugins: []), donc la sortie de render() est nue. */
+.project-body {
+  max-width: 68ch;
+}
+
+.project-body > * + * {
+  margin-top: var(--space-3);
+}
+
+.project-body h2 {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-ink);
+  border-top: 1px solid var(--color-border);
+  padding-top: var(--space-3);
+  margin-top: var(--space-8);
+}
+
+.project-body ul,
+.project-body ol {
+  padding-left: 1.25rem;
+  list-style: disc;
+}
+
+.project-body ol {
+  list-style: decimal;
+}
+
+.project-body li + li {
+  margin-top: var(--space-1);
+}
+
+.project-body strong {
+  color: var(--color-ink);
+  font-weight: 500;
+}
+
+.project-outcome {
+  border: 1px solid var(--color-border);
+  padding: var(--spacing-sm) var(--spacing-md);
+  max-width: 60ch;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -329,7 +375,7 @@ textarea:focus-visible {
 }
 
 @media (max-width: 767px) {
-  .project-quote {
+  .project-outcome {
     padding: var(--spacing-sm);
   }
 }
