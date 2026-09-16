@@ -1,9 +1,9 @@
 ---
 import type { Locale } from "../i18n";
 import type { CollectionEntry } from "astro:content";
-import { getCollection } from "astro:content";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import ProjectTemplate from "../components/ProjectTemplate.astro";
+import { getLocalizedProjects } from "./projectPaths";
 
 interface Props {
   locale: Locale;
@@ -12,9 +12,9 @@ interface Props {
 
 const { locale, project } = Astro.props;
 
-const orderedProjects = (await getCollection("projects")).sort(
-  (a, b) => a.data.order - b.data.order,
-);
+// Compteur et navigation ne portent que sur les projets de la locale courante,
+// sinon le total doublerait depuis que chaque projet existe en fr/ et en/.
+const orderedProjects = await getLocalizedProjects(locale);
 const currentIndex = orderedProjects.findIndex(
   (entry) => entry.id === project.id,
 );
