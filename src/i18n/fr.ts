@@ -13,16 +13,6 @@ export const t = {
     title: "M.L",
     name: "Matteo Lorenzi",
     role: "Étudiant en Web éditorial et Stratégie UX",
-    scroll: "Défiler",
-  },
-  landing: {
-    kicker: "Accueil",
-    title: "Bienvenue",
-    subtitle: "Sur mon portfolio, n'hésite pas à explorer.",
-    modelSrc: "",
-    modelAlt: "Aperçu 3D du portfolio",
-    modelFallback:
-      "Ajoutez un modèle .glb dans /public/models puis renseignez landing.modelSrc.",
   },
   projects: {
     title: "Projets",

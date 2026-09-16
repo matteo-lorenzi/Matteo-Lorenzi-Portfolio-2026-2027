@@ -15,16 +15,6 @@ export const t: Translations = {
     title: "M.L",
     name: "Matteo Lorenzi",
     role: "Web Editorial and UX Strategy Student",
-    scroll: "Scroll",
-  },
-  landing: {
-    kicker: "Home",
-    title: "Welcome",
-    subtitle: "Feel free to explore my portfolio.",
-    modelSrc: "",
-    modelAlt: "3D preview of the portfolio",
-    modelFallback:
-      "Add a .glb model in /public/models then set landing.modelSrc.",
   },
   projects: {
     title: "Projects",
