@@ -11,7 +11,7 @@ function readInk(): string {
   const value = getComputedStyle(document.documentElement)
     .getPropertyValue("--color-ink")
     .trim();
-  return value || "#ffffff";
+  return value || "#ebecee";
 }
 
 function WireframeIcosahedron({
@@ -55,7 +55,7 @@ function WireframeIcosahedron({
 }
 
 export default function HeroScene({ fallbackLabel }: Props) {
-  const [ink, setInk] = useState("#ffffff");
+  const [ink, setInk] = useState("#ebecee");
   const [webgl, setWebgl] = useState<boolean | null>(null);
   const [reduced, setReduced] = useState(false);
 
