@@ -14,17 +14,7 @@ export const t: Translations = {
   hero: {
     title: "M.L",
     name: "Matteo Lorenzi",
-    role: "UI/UX Designer",
-    scroll: "Scroll",
-  },
-  landing: {
-    kicker: "Home",
-    title: "Welcome",
-    subtitle: "Feel free to explore my portfolio.",
-    modelSrc: "",
-    modelAlt: "3D preview of the portfolio",
-    modelFallback:
-      "Add a .glb model in /public/models then set landing.modelSrc.",
+    role: "Web Editorial and UX Strategy Student",
   },
   projects: {
     title: "Projects",

@@ -12,17 +12,7 @@ export const t = {
   hero: {
     title: "M.L",
     name: "Matteo Lorenzi",
-    role: "UI/UX Designer",
-    scroll: "Défiler",
-  },
-  landing: {
-    kicker: "Accueil",
-    title: "Bienvenue",
-    subtitle: "Sur mon portfolio, n'hésite pas à explorer.",
-    modelSrc: "",
-    modelAlt: "Aperçu 3D du portfolio",
-    modelFallback:
-      "Ajoutez un modèle .glb dans /public/models puis renseignez landing.modelSrc.",
+    role: "Étudiant en Web éditorial et Stratégie UX",
   },
   projects: {
     title: "Projets",
