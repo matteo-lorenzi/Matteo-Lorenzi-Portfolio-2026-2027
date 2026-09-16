@@ -31,3 +31,5 @@ skills-lock.json
 graphify-out/
 CLAUDE.md
 docs/agents/
+HANDOFF.md
+.playwright-mcp/
