@@ -2,8 +2,7 @@
 import type { Locale } from "../i18n";
 import { getTranslations } from "../i18n";
 import BaseLayout from "../layouts/BaseLayout.astro";
-import { getCollection } from "astro:content";
-import ProjectCard from "../components/ProjectCard.astro";
+import { getLocalizedProjects, projectSlug } from "./projectPaths";
 
 interface Props {
   locale: Locale;
@@ -12,292 +11,278 @@ interface Props {
 const { locale } = Astro.props;
 const t = getTranslations(locale);
 
-const projects = (await getCollection("projects")).sort(
-  (a, b) => a.data.order - b.data.order,
-);
-const normalizeCategory = (category: string) =>
-  category.toLowerCase().replace(/[^a-z]/g, "");
+const projects = await getLocalizedProjects(locale);
+const basePath = locale === "fr" ? "/fr/projets/" : "/en/projects/";
+
+// "UI/UX" -> "uiux" : sert de valeur de filtre et de clé de libellé i18n.
+const categoryKey = (category: string) =>
+  category.toLowerCase().replace(/[^a-z]/g, "") as keyof typeof t.projects.categories;
+
+/* Les boutons sont dérivés des catégories réellement présentes. C'est la cause
+   du bug d'origine : la barre était codée en dur avec Branding et Illustration,
+   que le contenu n'utilise pas, et cliquer dessus vidait la grille en silence. */
+const presentCategories = [...new Set(projects.map((p) => p.data.category))]
+  .sort((a, b) => a.localeCompare(b))
+  .map((category) => ({
+    key: categoryKey(category),
+    label: t.projects.categories[categoryKey(category)],
+    count: projects.filter((p) => p.data.category === category).length,
+  }));
 ---
 
 <BaseLayout locale={locale} title={`${t.projects.title} - M.L`}>
-  <section class="grid-main pb-16 pt-20 md:pt-24 lg:pt-32">
-    <div class="col-content space-y-16 projects-shell" data-project-view="grid">
-      <header class="border-b border-[var(--color-border)] pb-12 space-y-6">
-        <div class="reveal-item space-y-3">
-          <h1 class="text-heading">{t.projects.title}</h1>
-          <p class="text-label">{t.projects.count(projects.length)}</p>
-        </div>
-        <div class="reveal-item flex flex-wrap items-center gap-2">
-          <span class="text-label pr-2">{t.projects.view}</span>
-          <button
-            type="button"
-            class="project-view-button border border-[var(--color-border)] px-2 py-1 text-label transition-colors"
-            data-project-view-option="grid"
-            aria-pressed="true"
-          >
-            {t.projects.grid}
-          </button>
-          <button
-            type="button"
-            class="project-view-button border border-[var(--color-border)] px-2 py-1 text-label transition-colors"
-            data-project-view-option="list"
-            aria-pressed="false"
-          >
-            {t.projects.list}
-          </button>
-          <button
-            type="button"
-            class="project-view-button border border-[var(--color-border)] px-2 py-1 text-label transition-colors"
-            data-project-view-option="compact"
-            aria-pressed="false"
-          >
-            {t.projects.compact}
-          </button>
-        </div>
-        <div class="reveal-item flex flex-wrap gap-2">
+  <section class="grid-main pb-24 pt-20 md:pt-24 lg:pt-32">
+    <header
+      class="col-content reveal-item border-b border-[var(--color-border)] pb-10"
+    >
+      <h1 class="text-heading">{t.projects.title}</h1>
+      <p class="text-label mt-3">{t.projects.count(projects.length)}</p>
+    </header>
+
+    <nav
+      class="col-content mt-8 flex flex-wrap gap-2 reveal-item"
+      aria-label={t.projects.filterLabel}
+    >
+      <button
+        type="button"
+        class="project-filter-button border border-[var(--color-border)] px-2 py-1 text-label transition-colors"
+        data-project-filter-option="all"
+        aria-pressed="true"
+      >
+        {t.projects.all} [{projects.length}]
+      </button>
+      {
+        presentCategories.map((category) => (
           <button
             type="button"
             class="project-filter-button border border-[var(--color-border)] px-2 py-1 text-label transition-colors"
-            data-project-filter-option="all"
-            aria-pressed="true"
-          >
-            {t.projects.all}
-          </button>
-          <button
-            type="button"
-            class="project-filter-button border border-[var(--color-border)] px-2 py-1 text-label transition-colors"
-            data-project-filter-option="branding"
+            data-project-filter-option={category.key}
             aria-pressed="false"
           >
-            {t.projects.branding}
+            {category.label} [{category.count}]
           </button>
-          <button
-            type="button"
-            class="project-filter-button border border-[var(--color-border)] px-2 py-1 text-label transition-colors"
-            data-project-filter-option="uiux"
-            aria-pressed="false"
-          >
-            {t.projects.uiux}
-          </button>
-          <button
-            type="button"
-            class="project-filter-button border border-[var(--color-border)] px-2 py-1 text-label transition-colors"
-            data-project-filter-option="motion"
-            aria-pressed="false"
-          >
-            {t.projects.motion}
-          </button>
-          <button
-            type="button"
-            class="project-filter-button border border-[var(--color-border)] px-2 py-1 text-label transition-colors"
-            data-project-filter-option="print"
-            aria-pressed="false"
-          >
-            {t.projects.print}
-          </button>
-          <button
-            type="button"
-            class="project-filter-button border border-[var(--color-border)] px-2 py-1 text-label transition-colors"
-            data-project-filter-option="illustration"
-            aria-pressed="false"
-          >
-            {t.projects.illustration}
-          </button>
-        </div>
-        <div class="projects-grid">
-          {
-            projects.map((project) => (
-              <div
-                class="project-filter-item"
-                data-project-category={normalizeCategory(project.data.category)}
+        ))
+      }
+    </nav>
+
+    <div class="col-content mt-10">
+      <div class="project-index-head text-label" aria-hidden="true">
+        <span>{t.projects.columns.index}</span>
+        <span>{t.projects.columns.title}</span>
+        <span>{t.projects.columns.category}</span>
+        <span>{t.projects.columns.tools}</span>
+        <span>{t.projects.columns.year}</span>
+        <span></span>
+      </div>
+
+      <ul class="project-index">
+        {
+          projects.map((project) => (
+            <li
+              class="project-index-item"
+              data-project-category={categoryKey(project.data.category)}
+            >
+              <a
+                class="project-index-row"
+                href={`${basePath}${projectSlug(project)}/`}
               >
-                <ProjectCard project={project} locale={locale} />
-              </div>
-            ))
-          }
-        </div>
-      </header>
+                <span class="text-label project-index-order">
+                  [{String(project.data.order).padStart(2, "0")}]
+                </span>
+                <span class="project-index-main">
+                  <span class="project-index-title text-subheading">
+                    {project.data.title}
+                  </span>
+                  <span class="text-body project-index-desc">
+                    {project.data.description}
+                  </span>
+                  <span class="text-label project-index-meta">
+                    {`${t.projects.categories[categoryKey(project.data.category)]} · ${project.data.year}`}
+                  </span>
+                </span>
+                <span class="text-label project-index-category">
+                  {t.projects.categories[categoryKey(project.data.category)]}
+                </span>
+                <span class="text-label project-index-tools">
+                  {project.data.tools?.join(" · ")}
+                </span>
+                <span class="text-label project-index-year">
+                  {project.data.year}
+                </span>
+                <span class="text-label project-index-arrow" aria-hidden="true">
+                  →
+                </span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+
+      <p class="text-label mt-8" data-projects-empty hidden>
+        {t.projects.empty}
+      </p>
     </div>
-
-    <script>
-      // @ts-nocheck
-      import gsap from "gsap";
-      import ScrollTrigger from "gsap/ScrollTrigger";
-
-      gsap.registerPlugin(ScrollTrigger);
-
-      if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-        const cards = document.querySelectorAll(".project-filter-item");
-        if (cards.length) {
-          gsap.from(cards, {
-            y: 30,
-            opacity: 0,
-            duration: 0.6,
-            ease: "power2.out",
-            stagger: 0.08,
-            // clearProps : ne laisse aucun style inline qui gênerait le
-            // masquage des cartes par l'attribut hidden du filtre
-            clearProps: "all",
-            scrollTrigger: {
-              trigger: ".projects-grid",
-              start: "top 85%",
-              toggleActions: "play none none none",
-            },
-          });
-        }
-      }
-
-      const storageKey = "portfolio-project-view";
-      /** @type {NodeListOf<HTMLElement>} */
-      const shells = document.querySelectorAll(".projects-shell");
-
-      /**
-       * @param {HTMLElement} shell
-       * @param {string} view
-       */
-      const applyView = (shell, view) => {
-        shell.dataset.projectView = view;
-
-        /** @type {NodeListOf<HTMLButtonElement>} */
-        const buttons = shell.querySelectorAll("[data-project-view-option]");
-        buttons.forEach((button) => {
-          const active =
-            button.getAttribute("data-project-view-option") === view;
-          button.setAttribute("aria-pressed", String(active));
-        });
-      };
-
-      /**
-       * @param {HTMLElement} shell
-       * @param {string} filter
-       */
-      const applyFilter = (shell, filter) => {
-        /** @type {NodeListOf<HTMLElement>} */
-        const items = shell.querySelectorAll(".project-filter-item");
-        /** @type {NodeListOf<HTMLButtonElement>} */
-        const buttons = shell.querySelectorAll("[data-project-filter-option]");
-
-        items.forEach((item) => {
-          const category = item.dataset.projectCategory;
-          const isVisible = filter === "all" || category === filter;
-          item.toggleAttribute("hidden", !isVisible);
-        });
-
-        buttons.forEach((button) => {
-          const active =
-            button.getAttribute("data-project-filter-option") === filter;
-          button.setAttribute("aria-pressed", String(active));
-        });
-      };
-
-      const savedView = window.localStorage.getItem(storageKey);
-      const initialView =
-        savedView === "list" || savedView === "compact" ? savedView : "grid";
-
-      shells.forEach((shell) => {
-        applyView(shell, initialView);
-
-        /** @type {NodeListOf<HTMLButtonElement>} */
-        const buttons = shell.querySelectorAll("[data-project-view-option]");
-        /** @type {NodeListOf<HTMLButtonElement>} */
-        const filterButtons = shell.querySelectorAll(
-          "[data-project-filter-option]",
-        );
-
-        applyFilter(shell, "all");
-
-        buttons.forEach((button) => {
-          button.addEventListener("click", () => {
-            const view = button.getAttribute("data-project-view-option");
-
-            if (!view) return;
-
-            window.localStorage.setItem(storageKey, view);
-            applyView(shell, view);
-          });
-        });
-
-        filterButtons.forEach((button) => {
-          button.addEventListener("click", () => {
-            const filter = button.getAttribute("data-project-filter-option");
-            if (!filter) return;
-            applyFilter(shell, filter);
-          });
-        });
-      });
-    </script>
-
-    <style is:global>
-      .projects-shell .project-view-button[aria-pressed="true"] {
-        background: var(--color-ink);
-        color: var(--color-paper);
-        border-color: var(--color-ink);
-      }
-
-      .projects-shell .project-filter-button[aria-pressed="true"] {
-        background: var(--color-ink);
-        color: var(--color-paper);
-        border-color: var(--color-ink);
-      }
-
-      .projects-shell[data-project-view="grid"] .projects-grid {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 1.5rem;
-      }
-
-      .projects-shell[data-project-view="list"] .projects-grid {
-        display: grid;
-        grid-template-columns: 1fr;
-        gap: 1rem;
-      }
-
-      .projects-shell[data-project-view="compact"] .projects-grid {
-        display: grid;
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: 1rem;
-      }
-
-      .projects-shell[data-project-view="list"] .project-card {
-        display: grid;
-        grid-template-columns: minmax(220px, 320px) minmax(0, 1fr);
-        align-items: stretch;
-      }
-
-      .projects-shell[data-project-view="list"] .project-card__media,
-      .projects-shell[data-project-view="list"] .project-card__media img {
-        height: 100%;
-      }
-
-      .projects-shell[data-project-view="list"] .project-card__image {
-        aspect-ratio: auto;
-      }
-
-      .projects-shell[data-project-view="list"] .project-card__content {
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-      }
-
-      .projects-shell[data-project-view="compact"] .project-card__content {
-        padding: 1rem;
-      }
-
-      .projects-shell[data-project-view="compact"] .project-card h2 {
-        font-size: 1.25rem;
-      }
-
-      @media (max-width: 767px) {
-        .projects-shell[data-project-view="grid"] .projects-grid,
-        .projects-shell[data-project-view="compact"] .projects-grid,
-        .projects-shell[data-project-view="list"] .projects-grid {
-          grid-template-columns: 1fr;
-        }
-
-        .projects-shell[data-project-view="list"] .project-card {
-          grid-template-columns: 1fr;
-        }
-      }
-    </style>
   </section>
 </BaseLayout>
+
+<script>
+  // @ts-nocheck
+  import gsap from "gsap";
+  import ScrollTrigger from "gsap/ScrollTrigger";
+
+  gsap.registerPlugin(ScrollTrigger);
+
+  const rows = document.querySelectorAll(".project-index-item");
+
+  if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    gsap.from(rows, {
+      y: 24,
+      opacity: 0,
+      duration: 0.5,
+      stagger: 0.05,
+      ease: "power3.out",
+      scrollTrigger: { trigger: ".project-index", start: "top bottom-=10%" },
+      // clearProps : sans ça les styles inline de GSAP se battent avec
+      // l'attribut hidden posé par le filtre.
+      clearProps: "all",
+    });
+  }
+
+  const buttons = document.querySelectorAll("[data-project-filter-option]");
+  const emptyMessage = document.querySelector("[data-projects-empty]");
+
+  const applyFilter = (filter) => {
+    let visible = 0;
+    rows.forEach((row) => {
+      const match = filter === "all" || row.dataset.projectCategory === filter;
+      row.hidden = !match;
+      if (match) visible += 1;
+    });
+    buttons.forEach((button) => {
+      button.setAttribute(
+        "aria-pressed",
+        String(button.dataset.projectFilterOption === filter),
+      );
+    });
+    if (emptyMessage) emptyMessage.hidden = visible > 0;
+  };
+
+  buttons.forEach((button) => {
+    button.addEventListener("click", () => {
+      applyFilter(button.dataset.projectFilterOption);
+    });
+  });
+</script>
+
+<style>
+  .project-filter-button[aria-pressed="true"] {
+    background: var(--color-ink);
+    color: var(--color-paper);
+    border-color: var(--color-ink);
+  }
+
+  .project-index {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border-top: 1px solid var(--color-border);
+  }
+
+  .project-index-head,
+  .project-index-row {
+    display: grid;
+    grid-template-columns: 4rem minmax(0, 1fr) 7rem 14rem 4rem 2rem;
+    gap: var(--grid-gutter);
+    align-items: baseline;
+  }
+
+  .project-index-head {
+    padding-bottom: var(--space-2);
+    color: var(--color-muted);
+  }
+
+  .project-index-row {
+    padding: var(--space-3) 0;
+    border-bottom: 1px solid var(--color-border);
+    transition:
+      background var(--transition-base),
+      color var(--transition-base);
+  }
+
+  .project-index-desc {
+    display: block;
+    margin-top: var(--space-1);
+    max-width: 60ch;
+  }
+
+  /* Ligne mono de repli : ne sert que quand les colonnes disparaissent. */
+  .project-index-meta {
+    display: none;
+  }
+
+  .project-index-title {
+    display: block;
+    color: var(--color-ink);
+  }
+
+  .project-index-arrow {
+    justify-self: end;
+    transition: transform var(--transition-base);
+  }
+
+  .project-index-row:hover,
+  .project-index-row:focus-visible {
+    background: var(--color-paper-warm);
+  }
+
+  .project-index-row:hover .project-index-arrow,
+  .project-index-row:focus-visible .project-index-arrow {
+    transform: translateX(4px);
+  }
+
+  /* Sous 1025px les .col-* passent pleine largeur. Les colonnes Type, Outils et
+     Année sortent ensemble, et la ligne mono sous le titre reprend le type et
+     l'année — sinon l'information disparaîtrait entre 768 et 1024px. Le nombre
+     de colonnes doit correspondre au nombre d'enfants restants, sans quoi la
+     flèche bascule sur une deuxième ligne. */
+  @media (max-width: 1024px) {
+    .project-index-head {
+      display: none;
+    }
+
+    .project-index-row {
+      grid-template-columns: 4rem minmax(0, 1fr) 2rem;
+    }
+
+    .project-index-category,
+    .project-index-tools,
+    .project-index-year {
+      display: none;
+    }
+
+    .project-index-meta {
+      display: block;
+      margin-top: var(--space-1);
+      color: var(--color-muted);
+    }
+  }
+
+  @media (max-width: 767px) {
+    .project-index-row {
+      grid-template-columns: 1fr;
+      gap: 0;
+    }
+
+    .project-index-order,
+    .project-index-arrow {
+      display: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .project-index-row,
+    .project-index-arrow {
+      transition: none;
+    }
+  }
+</style>

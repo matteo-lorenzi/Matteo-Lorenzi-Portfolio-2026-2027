@@ -1,6 +1,5 @@
 // @ts-check
 import { defineConfig } from "astro/config";
-import react from "@astrojs/react";
 
 export default defineConfig({
   site: process.env.SITE_URL ?? "https://matteo-lorenzi.github.io",
@@ -14,5 +13,4 @@ export default defineConfig({
       exclude: ["gsap", "gsap/ScrollTrigger"],
     },
   },
-  integrations: [react()],
 });

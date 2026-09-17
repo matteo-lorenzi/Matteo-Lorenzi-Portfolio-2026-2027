@@ -10,29 +10,52 @@ interface Props {
 
 const { locale } = Astro.props;
 const t = getTranslations(locale);
-const pageTitle =
-  locale === "fr"
-    ? "Experience professionnelle - M.L"
-    : "Professional Experience - M.L";
-
 const isFr = locale === "fr";
-const experiences = (await getCollection("experiences"))
-  .sort((a, b) => a.data.order - b.data.order)
-  .map((item) => ({
-    id: item.id,
-    period: item.data.period,
-    company: item.data.company,
-    type: isFr ? item.data.type_fr : item.data.type_en,
-    role: isFr ? item.data.role_fr : item.data.role_en,
-    location: isFr ? item.data.location_fr : item.data.location_en,
-    summary: isFr ? item.data.summary_fr : item.data.summary_en,
-    highlights: isFr ? item.data.highlights_fr : item.data.highlights_en,
-  }));
+const pageTitle = `${t.experiencePage.title} - M.L`;
+
+const entries = (await getCollection("experiences")).map((item) => ({
+  id: item.id,
+  start: item.data.start,
+  end: item.data.end,
+  organisation: item.data.organisation,
+  company: item.data.company,
+  team: isFr ? item.data.team_fr : item.data.team_en,
+  type: isFr ? item.data.type_fr : item.data.type_en,
+  role: isFr ? item.data.role_fr : item.data.role_en,
+  location: isFr ? item.data.location_fr : item.data.location_en,
+  duration: isFr ? item.data.duration_fr : item.data.duration_en,
+  summary: isFr ? item.data.summary_fr : item.data.summary_en,
+  highlights: isFr ? item.data.highlights_fr : item.data.highlights_en,
+}));
+
+/* Regroupe par organisation, puis trie tout en anti-chronologique : les blocs
+   par leur période la plus récente, les entrées d'un bloc entre elles. Le tri
+   est dérivé des dates, plus d'un champ order maintenu à la main. */
+const groups = [...new Map(entries.map((e) => [e.organisation, e])).keys()]
+  .map((organisation) => {
+    const items = entries
+      .filter((entry) => entry.organisation === organisation)
+      .sort((a, b) => b.start - a.start);
+    return {
+      organisation,
+      company: items[0].company,
+      items,
+      start: Math.min(...items.map((i) => i.start)),
+      end: items.some((i) => i.end === undefined)
+        ? undefined
+        : Math.max(...items.map((i) => i.end as number)),
+      latest: Math.max(...items.map((i) => i.start)),
+    };
+  })
+  .sort((a, b) => b.latest - a.latest);
+
+const span = (start: number, end?: number) =>
+  end === undefined ? `${start} — ${t.experiencePage.present}` : `${start} — ${end}`;
 ---
 
 <BaseLayout locale={locale} title={pageTitle}>
-  <section class="grid-main pb-16 pt-20 md:pt-24 lg:pt-32">
-    <div class="col-content space-y-16">
+  <section class="grid-main pb-24 pt-20 md:pt-24 lg:pt-32">
+    <div class="col-content">
       <header
         class="reveal-item space-y-6 border-b border-[var(--color-border)] pb-12"
       >
@@ -45,124 +68,171 @@ const experiences = (await getCollection("experiences"))
         </p>
       </header>
 
-      <p class="text-label">{t.experiencePage.count(experiences.length)}</p>
+      <p class="text-label mt-8">{t.experiencePage.count(entries.length)}</p>
 
-      <div class="experience-rail">
-        <svg
-          class="experience-line"
-          aria-hidden="true"
-          viewBox="0 0 2 100"
-          preserveAspectRatio="none"
-        >
-          <line x1="1" y1="0" x2="1" y2="100" pathLength="1"></line>
-        </svg>
-        <ul class="experience-gallery" role="list">
+      <ol class="experience-timeline" role="list">
         {
-          experiences.map((item, index) => (
-            <li
-              class:list={[
-                "reveal-item experience-card border border-[var(--color-border)] p-6 md:p-8",
-                index % 3 === 0 ? "md:col-span-2" : "md:col-span-1",
-              ]}
-            >
-              <article aria-labelledby={`experience-title-${item.id}`}>
-                <div class="flex flex-wrap items-center gap-3">
-                  <p class="text-label text-[var(--color-ink)]">
-                    {item.period}
-                  </p>
-                  <span class="tag-radius border border-[var(--color-border)] px-2 py-1 text-label">
-                    {item.type}
-                  </span>
-                </div>
-                <h2
-                  id={`experience-title-${item.id}`}
-                  class="mt-4 text-subheading text-[var(--color-ink)]"
-                >
-                  {item.role}
+          groups.map((group) => (
+            <li class="experience-group">
+              {/* Pas d'aria-hidden : c'est le seul endroit où les dates du
+                  bloc sont énoncées quand il ne compte qu'une période. */}
+              <p class="experience-years text-label">
+                <span>{group.start}</span>
+                <span class="experience-year-sep" aria-hidden="true">—</span>
+                <span>{group.end ?? t.experiencePage.present}</span>
+              </p>
+
+              <div class="experience-track" aria-hidden="true">
+                <span class="experience-node" />
+              </div>
+
+              <div class="experience-body">
+                <h2 class="text-subheading text-[var(--color-ink)]">
+                  {group.company}
                 </h2>
-                <p class="mt-2 text-body text-[var(--color-ink)]">
-                  {item.company} · {item.location}
-                </p>
-                <p class="mt-4 text-body">{item.summary}</p>
-                <ul class="mt-6 list-disc space-y-2 pl-5 text-body">
-                  {item.highlights.map((highlight) => (
-                    <li>{highlight}</li>
+                {
+                  /* La plage du bloc est déjà dans la gouttière : on n'ajoute
+                     ici que ce qu'elle ne dit pas. */
+                  group.items.length > 1 && (
+                    <p class="text-label mt-2">
+                      {t.experiencePage.periodCount(group.items.length)}
+                    </p>
+                  )
+                }
+
+                <ol class="experience-entries mt-6" role="list">
+                  {group.items.map((item) => (
+                    <li class="experience-card reveal-item border border-[var(--color-border)] p-6 md:p-8">
+                      <article aria-labelledby={`experience-title-${item.id}`}>
+                        <div class="flex flex-wrap items-baseline gap-x-3 gap-y-2">
+                          <span class="tag-radius border border-[var(--color-border)] px-2 py-1 text-label">
+                            {item.type}
+                          </span>
+                          {/* La période par carte ne sert qu'à distinguer les
+                              missions d'un même employeur ; seule, elle
+                              répéterait la gouttière. */}
+                          {group.items.length > 1 && (
+                            <p class="text-label text-[var(--color-ink)]">
+                              {span(item.start, item.end)}
+                            </p>
+                          )}
+                          {item.duration && (
+                            <p class="text-label">{item.duration}</p>
+                          )}
+                        </div>
+
+                        <h3
+                          id={`experience-title-${item.id}`}
+                          class="mt-4 text-subheading text-[var(--color-ink)]"
+                        >
+                          {item.role}
+                        </h3>
+                        <p class="text-label mt-2">
+                          {item.team
+                            ? `${item.team} · ${item.location}`
+                            : item.location}
+                        </p>
+
+                        <p class="mt-4 text-body max-w-[64ch]">{item.summary}</p>
+
+                        <ul class="mt-6 space-y-2 text-body" role="list">
+                          {item.highlights.map((highlight) => (
+                            <li class="experience-highlight">{highlight}</li>
+                          ))}
+                        </ul>
+                      </article>
+                    </li>
                   ))}
-                </ul>
-              </article>
+                </ol>
+              </div>
             </li>
           ))
         }
-        </ul>
-      </div>
+      </ol>
     </div>
   </section>
 
-  <script>
-    import gsap from "gsap";
-    import ScrollTrigger from "gsap/ScrollTrigger";
-
-    gsap.registerPlugin(ScrollTrigger);
-
-    if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      const line = document.querySelector(".experience-line line");
-      if (line) {
-        gsap.to(line, {
-          strokeDashoffset: 0,
-          ease: "none",
-          scrollTrigger: {
-            trigger: ".experience-rail",
-            start: "top 80%",
-            end: "bottom 60%",
-            scrub: true,
-          },
-        });
-      }
-    }
-  </script>
-
-  <style is:global>
-    .experience-rail {
-      position: relative;
+  <style>
+    /* L'espacement haut vit ici et non en classe Tailwind : une règle
+       `margin: 0` de ce bloc a la même spécificité qu'un `mt-10` mais passe
+       après dans la feuille, et l'écrasait. */
+    .experience-timeline {
+      list-style: none;
+      margin: var(--space-8) 0 0;
+      padding: 0;
     }
 
-    .experience-line {
-      position: absolute;
-      left: -24px;
-      top: 0;
-      height: 100%;
-      width: 2px;
-      overflow: visible;
-    }
-
-    .experience-line line {
-      stroke: var(--color-ink);
-      stroke-width: 2;
-      stroke-dasharray: 1;
-      stroke-dashoffset: 1;
-    }
-
-    @media (max-width: 1024px) {
-      .experience-line {
-        display: none;
-      }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      .experience-line line {
-        stroke-dashoffset: 0;
-      }
-    }
-
-    .experience-gallery {
+    /* Trois colonnes : gouttière d'années, rail, contenu. La chronologie vit
+       hors de la carte pour que l'œil la trouve sans lire. */
+    .experience-group {
       display: grid;
-      gap: 1rem;
-      grid-template-columns: 1fr;
+      grid-template-columns: 5rem 1.5rem minmax(0, 1fr);
+      column-gap: var(--space-2);
+    }
+
+    .experience-group + .experience-group {
+      margin-top: var(--space-12);
+    }
+
+    /* Plus gros que .text-label : la gouttière doit se lire d'un coup d'œil,
+       c'est elle qui porte la chronologie hors de la carte. */
+    .experience-years {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      margin: 0;
+      font-size: 14px;
+      letter-spacing: 0.06em;
+      line-height: 1.5;
+      color: var(--color-ink);
+      /* Aligne la première année sur la ligne de base du nom d'employeur. */
+      padding-top: 0.2em;
+    }
+
+    .experience-year-sep {
+      color: var(--color-muted);
+    }
+
+    /* Le rail portait déjà un SVG, mais sans nœud ni lien avec les cartes : il
+       annonçait une chronologie que la grille démentait. */
+    .experience-track {
+      position: relative;
+      display: flex;
+      justify-content: center;
+      padding-top: 0.5em;
+    }
+
+    .experience-track::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 1px;
+      background: var(--color-border);
+    }
+
+    /* Le trait franchit l'écart entre deux blocs, sinon la frise se lit comme
+       des segments détachés au lieu d'un axe continu. Le dernier s'arrête net. */
+    .experience-group:not(:last-child) .experience-track::before {
+      bottom: calc(-1 * var(--space-12));
+    }
+
+    .experience-node {
+      position: relative;
+      width: 9px;
+      height: 9px;
+      background: var(--color-ink);
+    }
+
+    .experience-entries {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: grid;
+      gap: var(--space-3);
     }
 
     .experience-card {
-      position: relative;
-      overflow: hidden;
       background: linear-gradient(
         145deg,
         color-mix(in srgb, var(--color-paper) 88%, var(--color-ink) 12%) 0%,
@@ -177,9 +247,43 @@ const experiences = (await getCollection("experiences"))
       border-color: var(--color-ink);
     }
 
-    @media (min-width: 768px) {
-      .experience-gallery {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
+    /* Puces en tiret cadratin plutôt qu'en disque : même registre éditorial que
+       le reste du site, où rien n'est arrondi. */
+    .experience-highlight {
+      position: relative;
+      padding-left: 1.25rem;
+    }
+
+    .experience-highlight::before {
+      content: "—";
+      position: absolute;
+      left: 0;
+      color: var(--color-muted);
+    }
+
+    /* Sous 768px la gouttière coûterait trop de largeur au contenu : les années
+       repassent en ligne au-dessus du bloc et le rail disparaît. */
+    @media (max-width: 767px) {
+      .experience-group {
+        grid-template-columns: 1fr;
+      }
+
+      .experience-track {
+        display: none;
+      }
+
+      .experience-years {
+        flex-direction: row;
+        align-items: baseline;
+        gap: 0.4em;
+        padding-top: 0;
+        margin-bottom: var(--space-2);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .experience-card {
+        transition: none;
       }
     }
   </style>

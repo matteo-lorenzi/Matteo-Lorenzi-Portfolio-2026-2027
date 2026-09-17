@@ -2,7 +2,7 @@
 import ProjectDetailScreen from "../../../screens/ProjectDetailScreen.astro";
 import { getProjectStaticPaths } from "../../../screens/projectPaths";
 
-export const getStaticPaths = getProjectStaticPaths;
+export const getStaticPaths = getProjectStaticPaths("fr");
 
 const { project } = Astro.props;
 ---

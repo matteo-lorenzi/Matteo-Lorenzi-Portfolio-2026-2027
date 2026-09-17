@@ -12,38 +12,41 @@ export const t = {
   hero: {
     title: "M.L",
     name: "Matteo Lorenzi",
-    role: "UI/UX Designer",
-    scroll: "Défiler",
-  },
-  landing: {
-    kicker: "Accueil",
-    title: "Bienvenue",
-    subtitle: "Sur mon portfolio, n'hésite pas à explorer.",
-    modelSrc: "",
-    modelAlt: "Aperçu 3D du portfolio",
-    modelFallback:
-      "Ajoutez un modèle .glb dans /public/models puis renseignez landing.modelSrc.",
+    role: "Étudiant en Web éditorial et Stratégie UX",
   },
   projects: {
     title: "Projets",
     all: "Tous",
-    view: "Affichage",
-    grid: "Grille",
-    list: "Liste",
-    compact: "Compact",
-    branding: "Branding",
-    uiux: "UI/UX",
-    motion: "Motion",
-    print: "Print",
-    illustration: "Illustration",
+    /* Les boutons de filtre sont générés depuis les catégories réellement
+       présentes dans la collection ; ces libellés couvrent tout l'enum pour
+       qu'une nouvelle catégorie s'affiche sans retoucher l'i18n. */
+    categories: {
+      branding: "Branding",
+      uiux: "UI/UX",
+      motion: "Motion",
+      print: "Print",
+      illustration: "Illustration",
+    },
     count: (n: number) => `[ ${n} projets ]`,
+    empty: "Aucun projet dans cette catégorie.",
+    filterLabel: "Filtrer par type",
+    columns: {
+      index: "Nº",
+      title: "Projet",
+      category: "Type",
+      tools: "Outils",
+      year: "Année",
+    },
   },
   projectDetail: {
     role: "Rôle",
+    context: "Contexte",
     tools: "Outils",
     year: "Année",
+    problem: "Problème",
+    outcome: "Résultat",
+    caseStudy: "Déroulé",
     watchVideo: "Voir la vidéo du projet",
-    quoteLabel: "Retour d'expérience",
     navLabel: "Navigation entre les projets",
     prev: "← Projet précédent",
     backToList: "Tous les projets",
@@ -75,8 +78,11 @@ export const t = {
     title: "Expérience professionnelle",
     kicker: "Parcours",
     intro:
-      "Une galerie de mes expériences de terrain : mission, contexte et responsabilités.",
+      "Mon parcours de terrain, du plus récent au plus ancien : mission, contexte et responsabilités.",
     count: (n: number) => `[ ${n} expériences ]`,
+    present: "En cours",
+    /* Étiquette du bloc employeur quand plusieurs périodes s'y rattachent. */
+    periodCount: (n: number) => (n > 1 ? `${n} périodes` : `${n} période`),
   },
   notFound: {
     kicker: "Erreur 404",
