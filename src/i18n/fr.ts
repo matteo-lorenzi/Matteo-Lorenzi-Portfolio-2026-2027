@@ -78,8 +78,11 @@ export const t = {
     title: "Expérience professionnelle",
     kicker: "Parcours",
     intro:
-      "Une galerie de mes expériences de terrain : mission, contexte et responsabilités.",
+      "Mon parcours de terrain, du plus récent au plus ancien : mission, contexte et responsabilités.",
     count: (n: number) => `[ ${n} expériences ]`,
+    present: "En cours",
+    /* Étiquette du bloc employeur quand plusieurs périodes s'y rattachent. */
+    periodCount: (n: number) => (n > 1 ? `${n} périodes` : `${n} période`),
   },
   notFound: {
     kicker: "Erreur 404",

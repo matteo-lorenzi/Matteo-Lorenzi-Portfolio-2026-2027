@@ -128,7 +128,11 @@ textarea:focus-visible {
   display: grid;
   grid-template-columns: repeat(12, 1fr);
   gap: var(--grid-gutter);
-  padding: 0 var(--spacing-md);
+  /* padding-inline et non la forme raccourcie : `padding: 0 X` remettait le
+     padding vertical à zéro, et comme cette règle passe après les utilitaires
+     Tailwind à spécificité égale, elle annulait toutes les classes de padding
+     vertical posées sur les sections — le contenu passait sous la nav fixe. */
+  padding-inline: var(--spacing-md);
 }
 
 .col-content {
@@ -410,7 +414,7 @@ textarea:focus-visible {
 @media (max-width: 1024px) {
   .grid-main {
     grid-template-columns: repeat(8, 1fr);
-    padding: 0 24px;
+    padding-inline: 24px;
   }
 
   .col-content,
@@ -423,7 +427,7 @@ textarea:focus-visible {
 @media (max-width: 767px) {
   .grid-main {
     grid-template-columns: repeat(4, 1fr);
-    padding: 0 16px;
+    padding-inline: 16px;
     gap: 16px;
   }
 }

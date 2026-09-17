@@ -78,8 +78,10 @@ export const t: Translations = {
     title: "Professional Experience",
     kicker: "Journey",
     intro:
-      "A gallery view of my hands-on work experience: mission context, responsibilities, and product impact.",
+      "My hands-on track record, most recent first: mission context, responsibilities, and scope.",
     count: (n: number) => `[ ${n} experiences ]`,
+    present: "Present",
+    periodCount: (n: number) => (n > 1 ? `${n} periods` : `${n} period`),
   },
   notFound: {
     kicker: "Error 404",
